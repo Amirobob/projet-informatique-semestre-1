@@ -110,6 +110,7 @@ void print_map(char map[xmax][ymax], int level, int life, int score, int timerem
         stat(y, level, life, score, timeremaining, turnsleft, squareleft, triangleleft, circleleft);
         printf("\n");
     }
+    set_color(WHITE, BLACK);
 }
 
 void print_stats(int level, int life, int score, int timeremaining, int turnsleft, int squareleft, int triangleleft, int circleleft) {
