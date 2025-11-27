@@ -7,115 +7,149 @@
 #include <time.h>
 #include <string.h>
 #include <conio.h>
-
+// Map[x][y] where x is column, y is row.
 void generate_map(char map[xmax][ymax]) {
     int temp;
-    
-    // Initial map generation
-    for (int i = 0; i < ymax; i++){
-        for (int j = 0 ; j < xmax; j++){
-            temp = rand()%3;
-            if (i == 0 || i == ymax-1 || j == 0 || j == xmax-1 ){
-                map[j][i] = '#';
-            }
-            else if (temp == 0){
-                map[j][i] = 'O '; // circle
-            }
-            else if (temp == 1){
-                map[j][i] = 'H '; // square
-            }
-            else if (temp == 2){
-                map[j][i] = 'T '; // triangles
+    for (int y = 0; y < ymax; y++) {
+        for (int x = 0; x < xmax; x++) {
+            if (y == 0 || y == ymax - 1 || x == 0 || x == xmax - 1) {
+                map[x][y] = '#';
+            } else {
+                temp = rand() % 3;
+                if (temp == 0)      map[x][y] = CIRCLE;
+                else if (temp == 1) map[x][y] = SQUARE;
+                else                map[x][y] = TRIANGLE;
             }
         }
     }
 
-    // Ensure no three consecutive identical shapes horizontally or vertically
-    for (int i = 0; i < ymax; i++){
-        for (int j = 0 ; j < xmax; j++){
-            // Check for horizontal repeats
-            if (j <= xmax - 3 && map[j][i] == map[j+1][i] && map[j][i] == map[j+2][i]) {
-                switch(map[j][i]) {
-                    case 'O':
-                        map[j][i] = 'H ';
-                        break;
-                    case 'H':
-                        map[j][i] = 'T ';
-                        break;
-                    case 'T':
-                        map[j][i] = 'O ';
-                        break;
+    // Remove any horizontal or vertical runs of 3 identical interior shapes
+    boolean changed = 1;
+    // when a change is made, this runs again
+    while (changed) {
+        changed = 0;
+        for (int y = 1; y < ymax - 1; y++) {
+            for (int x = 1; x < xmax - 1; x++) {
+                // Horizontal
+                if (x <= xmax - 3 && map[x][y] == map[x+1][y] && map[x][y] == map[x+2][y]) {
+                    switch (map[x][y]) {
+                        case CIRCLE:   map[x][y] = SQUARE; break;
+                        case SQUARE:   map[x][y] = TRIANGLE; break;
+                        case TRIANGLE: map[x][y] = CIRCLE; break;
+                    }
+                    changed = 1;
                 }
-            }
-            // Check for vertical repeats
-            if (i <= ymax - 3 && map[j][i] == map[j][i+1] && map[j][i] == map[j][i+2]) {
-                switch(map[j][i]) {
-                    case 'O':
-                        map[j][i] = 'H';
-                        break;
-                    case 'H':
-                        map[j][i] = 'T';
-                        break;
-                    case 'T':
-                        map[j][i] = 'O';
-                        break;
+                // Vertical
+                if (y <= ymax - 3 && map[x][y] == map[x][y+1] && map[x][y] == map[x][y+2]) {
+                    switch (map[x][y]) {
+                        case CIRCLE:   map[x][y] = SQUARE; break;
+                        case SQUARE:   map[x][y] = TRIANGLE; break;
+                        case TRIANGLE: map[x][y] = CIRCLE; break;
+                    }
+                    changed = 1;
                 }
             }
         }
     }
 }
 
-int main() {
-    int level = 1, life = 3, score = 0, timeremaining = 60, turnsleft = 20, squareleft = 50, triangleleft = 50 , circleleft = 50;
-    char map[xmax][ymax];
-    clrscr();
-    srand(time(NULL));
-    show_cursor();
-    printf("welcome to ECE Heroes!\n\n");
-    set_color(GREEN, BLACK);
-    printf("SCORE : %d\n", score);
+void stat(int y, int level, int life, int score, int timeremaining, int turnsleft, int squareleft, int triangleleft, int circleleft){
+    switch(y) {
+        case 1:
+        set_color(GREEN, BLACK);
+            printf("   |Score: %d", score);
+            break;
+        case 2:
+        set_color(MAGENTA, BLACK);
+            printf("   |Level: %d\tLives: %d", level, life);
+            break;
+        case 3:
+        set_color(RED, BLACK);
+            printf("   |Time: %d\tTurns: %d", timeremaining, turnsleft);
+            break;
+        case 4:
+            set_color(YELLOW, BLACK);
+            printf("   |Squares left: %d", squareleft);
+            break;
+        case 5:
+            set_color(GREEN, BLACK);
+            printf("   |Triangles left: %d", triangleleft);
+            break;
+        case 6:
+            set_color(BLUE, BLACK);
+            printf("   |Circles left: %d", circleleft);
+            break;
+    }
+}
 
-    // Generate the map
-    generate_map(map);
-
-    // map display //
-    for (int i = 0; i < ymax; i++){
-        for (int j = 0 ; j < xmax; j++){
+void print_map(char map[xmax][ymax], int level, int life, int score, int timeremaining, int turnsleft, int squareleft, int triangleleft, int circleleft) {
+    // Top coordinate header
+    SetConsoleOutputCP(65001);
+    set_color(WHITE, BLACK);
+    printf("   ");
+    for (int x = 0; x < xmax; x++);
+    printf("\n");
+    for (int y = 0; y < ymax; y++) {
+        for (int x = 0; x < xmax; x++) {
+            char c = map[x][y];
             set_color(WHITE, BLACK);
-            if (map[j][i] == 'O'){
+            if (c == CIRCLE) {
                 set_color(BLUE, BLACK);
-            }
-            else if (map[j][i] == 'H'){
+                printf("● ");
+            } else if (c == SQUARE) {
                 set_color(YELLOW, BLACK);
-            }
-            else if (map[j][i] == 'T'){
+                printf("■ ");
+            } else if (c == TRIANGLE) {
                 set_color(GREEN, BLACK);
-            }
-            printf("%c",map[j][i]);
-
-
-            // side information display //
-            if (i == 0 && j == xmax-1){
+                printf("▲ ");
+            } else if (c == '#') {
                 set_color(MAGENTA, BLACK);
-                printf(" |Level: %d\t lives remaining: %d", level , life);
-            }
-            if (i == 2 && j == xmax-1){
-                set_color(RED, BLACK);
-                printf(" |time remaining: %d\t turns left: %d", timeremaining, turnsleft);
-            }
-            if (i == 4 && j == xmax-1){
-                set_color(YELLOW, BLACK);
-                printf(" |squares left: %d", squareleft);
-            }
-            if (i == 5 && j == xmax-1){
-                set_color(GREEN, BLACK);
-                printf(" |triangles left: %d", triangleleft);
-            }
-            if (i == 6 && j == xmax-1){
-                set_color(BLUE, BLACK);
-                printf(" |circles left: %d", circleleft);
+                printf("▩ ");
             }
         }
+        stat(y, level, life, score, timeremaining, turnsleft, squareleft, triangleleft, circleleft);
         printf("\n");
     }
+}
+
+void print_stats(int level, int life, int score, int timeremaining, int turnsleft,
+                        int squareleft, int triangleleft, int circleleft) {
+    set_color(GREEN, BLACK);
+    printf("Score: %d\n", score);
+    set_color(MAGENTA, BLACK);
+    printf("Level: %d\tLives: %d\n", level, life);
+    set_color(RED, BLACK);
+    printf("Time: %d\tTurns: %d\n", timeremaining, turnsleft);
+    set_color(YELLOW, BLACK);
+    printf("Squares left: %d\n", squareleft);
+    set_color(GREEN, BLACK);
+    printf("Triangles left: %d\n", triangleleft);
+    set_color(BLUE, BLACK);
+    printf("Circles left: %d\n", circleleft);
+}
+
+void legend(void) {
+    set_color(WHITE, BLACK);
+    printf("\nLegend: ");
+    set_color(BLUE, BLACK);   printf("%c Circle  ", CIRCLE);
+    set_color(YELLOW, BLACK); printf("%c Square  ", SQUARE);
+    set_color(GREEN, BLACK);  printf("%c Triangle  ", TRIANGLE);
+    set_color(MAGENTA, BLACK);printf("# Border\n\n");
+    set_color(WHITE, BLACK);
+}
+
+int main() {
+
+    int level = 1, life = 3, score = 0, timeremaining = 60, turnsleft = 20;
+    int squareleft = 50, triangleleft = 50 , circleleft = 50;
+    char map[xmax][ymax];
+    clrscr();
+    srand((unsigned)time(NULL));
+    show_cursor();
+    printf("Welcome to ECE Heroes!\n\n");
+
+    generate_map(map);
+    print_map(map, level, life, score, timeremaining, turnsleft, squareleft, triangleleft, circleleft);
+
+    return 0;
 }

@@ -1,5 +1,9 @@
-#define xmax 20
-#define ymax 10
-#define circle ●
-#define triangle ▲
-#define square ■
+//square grid size
+#define GRID_SIZE 10
+#define xmax GRID_SIZE
+#define ymax GRID_SIZE
+
+// Shapes, we cannot change them to symbols here cuz switch case is annoying as hell
+#define CIRCLE 'c'
+#define TRIANGLE 't'
+#define SQUARE 's'
