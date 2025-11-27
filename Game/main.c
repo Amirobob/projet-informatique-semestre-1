@@ -139,7 +139,6 @@ void legend(void) {
 }
 
 int main() {
-
     int level = 1, life = 3, score = 0, timeremaining = 60, turnsleft = 20;
     int squareleft = 50, triangleleft = 50 , circleleft = 50;
     char map[xmax][ymax];
@@ -147,9 +146,7 @@ int main() {
     srand((unsigned)time(NULL));
     show_cursor();
     printf("Welcome to ECE Heroes!\n\n");
-
     generate_map(map);
     print_map(map, level, life, score, timeremaining, turnsleft, squareleft, triangleleft, circleleft);
-
     return 0;
 }
