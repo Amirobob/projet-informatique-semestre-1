@@ -112,8 +112,7 @@ void print_map(char map[xmax][ymax], int level, int life, int score, int timerem
     }
 }
 
-void print_stats(int level, int life, int score, int timeremaining, int turnsleft,
-                        int squareleft, int triangleleft, int circleleft) {
+void print_stats(int level, int life, int score, int timeremaining, int turnsleft, int squareleft, int triangleleft, int circleleft) {
     set_color(GREEN, BLACK);
     printf("Score: %d\n", score);
     set_color(MAGENTA, BLACK);
