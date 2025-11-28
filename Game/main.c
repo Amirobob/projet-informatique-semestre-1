@@ -7,7 +7,39 @@
 #include <time.h>
 #include <string.h>
 #include <conio.h>
-// Map[x][y] where x is column, y is row.
+#include <stdbool.h>
+// Map[x][y] where x is column, y is row
+char shapepick(char map[xmax][ymax], int x, int y) {
+    // Try shapes that won't create a new triple with neighbors
+    char candidates[3] = { CIRCLE, SQUARE, TRIANGLE };
+    for (int k = 0; k < 3; k++) {
+        char s = candidates[(k + rand()) % 3];
+        bool ok = true;
+        // Check horizontal triples centered at (x,y)
+        if (x >= 2 && map[x-1][y] == s && map[x-2][y] == s) ok = false;
+        if (x >= 1 && x+1 < xmax && map[x-1][y] == s && map[x+1][y] == s) ok = false;
+        if (x+2 < xmax && map[x+1][y] == s && map[x+2][y] == s) ok = false;
+        // Vertical
+        if (y >= 2 && map[x][y-1] == s && map[x][y-2] == s) ok = false;
+        if (y >= 1 && y+1 < ymax && map[x][y-1] == s && map[x][y+1] == s) ok = false;
+        if (y+2 < ymax && map[x][y+1] == s && map[x][y+2] == s) ok = false;
+        // Diagonal down-right
+        if (x >= 2 && y >= 2 && map[x-1][y-1] == s && map[x-2][y-2] == s) ok = false;
+        if (x >= 1 && y >= 1 && x+1 < xmax && y+1 < ymax && map[x-1][y-1] == s && map[x+1][y+1] == s) ok = false;
+        if (x+2 < xmax && y+2 < ymax && map[x+1][y+1] == s && map[x+2][y+2] == s) ok = false;
+        // Diagonal down-left
+        if (x+2 < xmax && y >= 2 && map[x+1][y-1] == s && map[x+2][y-2] == s) ok = false;
+        if (x >= 1 && y >= 1 && x+1 < xmax && y+1 < ymax && map[x+1][y-1] == s && map[x-1][y+1] == s) ok = false;
+        if (x >= 2 && y+2 < ymax && map[x-1][y+1] == s && map[x-2][y+2] == s) ok = false;
+        if (ok) return s;
+    }
+    // if hell lets loose
+    switch (map[x][y]) {
+        case CIRCLE:   return SQUARE;
+        case SQUARE:   return TRIANGLE;
+        default:       return CIRCLE;
+    }
+}
 void generate_map(char map[xmax][ymax]) {
     int temp;
     for (int y = 0; y < ymax; y++) {
@@ -23,30 +55,37 @@ void generate_map(char map[xmax][ymax]) {
         }
     }
 
-    // Remove any horizontal or vertical runs of 3 identical interior shapes
-    boolean changed = 1;
-    // when a change is made, this runs again
-    while (changed) {
-        changed = 0;
+    // remove identicals
+    bool changed = true;
+    int passes = 0;
+    while (changed && passes < 16) {
+        changed = false;
+        passes++;
         for (int y = 1; y < ymax - 1; y++) {
             for (int x = 1; x < xmax - 1; x++) {
                 // Horizontal
                 if (x <= xmax - 3 && map[x][y] == map[x+1][y] && map[x][y] == map[x+2][y]) {
-                    switch (map[x][y]) {
-                        case CIRCLE:   map[x][y] = SQUARE; break;
-                        case SQUARE:   map[x][y] = TRIANGLE; break;
-                        case TRIANGLE: map[x][y] = CIRCLE; break;
-                    }
-                    changed = 1;
+                    map[x][y] = shapepick(map, x, y);
+                    changed = true;
+                    continue;
                 }
                 // Vertical
                 if (y <= ymax - 3 && map[x][y] == map[x][y+1] && map[x][y] == map[x][y+2]) {
-                    switch (map[x][y]) {
-                        case CIRCLE:   map[x][y] = SQUARE; break;
-                        case SQUARE:   map[x][y] = TRIANGLE; break;
-                        case TRIANGLE: map[x][y] = CIRCLE; break;
-                    }
-                    changed = 1;
+                    map[x][y] = shapepick(map, x, y);
+                    changed = true;
+                    continue;
+                }
+                // Diagonal down-right
+                if (y <= ymax - 3 && x <= xmax - 3 && map[x][y] == map[x+1][y+1] && map[x][y] == map[x+2][y+2]) {
+                    map[x][y] = shapepick(map, x, y);
+                    changed = true;
+                    continue;
+                }
+                // Diagonal down-left
+                if (y <= ymax - 3 && x >= 2 && map[x][y] == map[x-1][y+1] && map[x][y] == map[x-2][y+2]) {
+                    map[x][y] = shapepick(map, x, y);
+                    changed = true;
+                    continue;
                 }
             }
         }
