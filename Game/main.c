@@ -9,114 +9,85 @@
 #include <conio.h>
 #include <stdbool.h>
 
-char shapepick(char map[xmax][ymax], int x, int y) {
-    char candidates[3] = { CIRCLE, SQUARE, TRIANGLE };
-    for (int k = 0; k < 3; k++) {
-        char s = candidates[(k + rand()) % 3];
-        bool ok = true;
-        // Check horizontal triples centered at (x,y)
-        if (x >= 2 && map[x-1][y] == s && map[x-2][y] == s) ok = false;
-        if (x >= 1 && x+1 < xmax && map[x-1][y] == s && map[x+1][y] == s) ok = false;
-        if (x+2 < xmax && map[x+1][y] == s && map[x+2][y] == s) ok = false;
-        // Vertical
-        if (y >= 2 && map[x][y-1] == s && map[x][y-2] == s) ok = false;
-        if (y >= 1 && y+1 < ymax && map[x][y-1] == s && map[x][y+1] == s) ok = false;
-        if (y+2 < ymax && map[x][y+1] == s && map[x][y+2] == s) ok = false;
-        // Diagonal down-right
-        if (x >= 2 && y >= 2 && map[x-1][y-1] == s && map[x-2][y-2] == s) ok = false;
-        if (x >= 1 && y >= 1 && x+1 < xmax && y+1 < ymax && map[x-1][y-1] == s && map[x+1][y+1] == s) ok = false;
-        if (x+2 < xmax && y+2 < ymax && map[x+1][y+1] == s && map[x+2][y+2] == s) ok = false;
-        // Diagonal down-left
-        if (x+2 < xmax && y >= 2 && map[x+1][y-1] == s && map[x+2][y-2] == s) ok = false;
-        if (x >= 1 && y >= 1 && x+1 < xmax && y+1 < ymax && map[x+1][y-1] == s && map[x-1][y+1] == s) ok = false;
-        if (x >= 2 && y+2 < ymax && map[x-1][y+1] == s && map[x-2][y+2] == s) ok = false;
-        if (ok) return s;
+char shapepick(char map[ymax][xmax], int x, int y, int direction) {
+    switch (direction) {
+        // this is very frustrating, I am taking a break
     }
-    // if hell lets loose
-    switch (map[x][y]) {
-        case CIRCLE:   return SQUARE;
-        case SQUARE:   return TRIANGLE;
-        default:       return CIRCLE;
-    }
+    map[y][x] = CIRCLE ? SQUARE : SQUARE ? TRIANGLE : CIRCLE;
 }
 
-void generate_map(char map[xmax][ymax]) {
+void generate_map(char map[ymax][xmax]) {
     int temp;
     for (int y = 0; y < ymax; y++) {
         for (int x = 0; x < xmax; x++) {
-            if (y == 0 || y == ymax - 1 || x == 0 || x == xmax - 1) {
-                map[x][y] = '#';
-            } else {
-                temp = rand() % 3;
-                if (temp == 0)      map[x][y] = CIRCLE;
-                else if (temp == 1) map[x][y] = SQUARE;
-                else                map[x][y] = TRIANGLE;
+            bool onborder = (y == 0 || y == ymax - 1|| x == 0 || x == xmax - 1);
+            if (onborder) map[y][x] = '#';
+            else {
+                switch(temp = rand() % 3) {
+                case(0): map[y][x] = CIRCLE; break;
+                case(1): map[y][x] = SQUARE; break;
+                case(2): map[y][x] = TRIANGLE; break;
+                }
             }
         }
     }
 
     // remove identicals
-    bool changed = true;
     int passes = 0;
-    while (changed && passes < 16) {
-        changed = false;
-        passes++;
-        for (int y = 1; y < ymax - 1; y++) {
-            for (int x = 1; x < xmax - 1; x++) {
+    do{
+        for (int y = 1; y < ymax - 2; y++) {
+            for (int x = 1; x < xmax - 2; x++) {
+                bool horizontal = (x <= xmax - 2 && map[y][x] == map[y][x+1] && map[y][x] == map[y][x+2]);
+                bool vertical = (y <= ymax - 3 && map[y][x] == map[y+1][x] && map[y][x] == map[y+2][x]);
+                bool diagonal_dr = (y <= ymax - 2 && x <= xmax - 2 && map[y][x] == map[y+1][x+1] && map[y][x] == map[y+2][x+2]);
+                bool diagonal_dl = (y <= ymax - 2 && x <= xmax - 2 && map[y][x] == map[y+1][x-1] && map[y][x] == map[y+2][x-2]);
                 // Horizontal
-                if (x <= xmax - 3 && map[x][y] == map[x+1][y] && map[x][y] == map[x+2][y]) {
-                    map[x][y] = shapepick(map, x, y);
-                    changed = true;
-                    continue;
+                if (horizontal) {
+                    shapepick(map, x, y,1);
                 }
                 // Vertical
-                if (y <= ymax - 3 && map[x][y] == map[x][y+1] && map[x][y] == map[x][y+2]) {
-                    map[x][y] = shapepick(map, x, y);
-                    changed = true;
-                    continue;
+                if (vertical) {
+                    shapepick(map, x, y,2);
                 }
                 // Diagonal down-right
-                if (y <= ymax - 3 && x <= xmax - 3 && map[x][y] == map[x+1][y+1] && map[x][y] == map[x+2][y+2]) {
-                    map[x][y] = shapepick(map, x, y);
-                    changed = true;
-                    continue;
+                if (diagonal_dr) {
+                    shapepick(map, x, y,3);
                 }
                 // Diagonal down-left
-                if (y <= ymax - 3 && x >= 2 && map[x][y] == map[x-1][y+1] && map[x][y] == map[x-2][y+2]) {
-                    map[x][y] = shapepick(map, x, y);
-                    changed = true;
-                    continue;
+                if (diagonal_dl) {
+                    shapepick(map, x, y,4);
                 }
             }
         }
-    }
+        passes++;
+    }while (passes < 20);
 }
 
-void stat(int y, int level, int life, int score, int timeremaining, int turnsleft, int squareleft, int triangleleft, int circleleft){
+void stat(int y,int stats[8]){
     switch(y) {
         case 1:
         set_color(GREEN, BLACK);
-            printf("   |Score: %d", score);
+            printf("   |Score: %d", stats[2]);
             break;
         case 2:
         set_color(MAGENTA, BLACK);
-            printf("   |Level: %d\tLives: %d", level, life);
+            printf("   |Level: %d\tLives: %d", stats[0], stats[1]);
             break;
         case 3:
         set_color(RED, BLACK);
-            printf("   |Time: %d\tTurns: %d", timeremaining, turnsleft);
+            printf("   |Time: %d\tTurns: %d", stats[3], stats[4]);
             break;
         case 4:
             set_color(YELLOW, BLACK);
-            printf("   |Squares left: %d", squareleft);
+            printf("   |Squares left: %d", stats[5]);
             break;
         case 5:
             set_color(GREEN, BLACK);
-            printf("   |Triangles left: %d", triangleleft);
+            printf("   |Triangles left: %d", stats[6]);
             break;
         case 6:
             set_color(BLUE, BLACK);
-            printf("   |Circles left: %d", circleleft);
+            printf("   |Circles left: %d", stats[7]);
             break;
     }
 }
@@ -135,11 +106,12 @@ void menu(void) {
     };
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j<32; j++) {
+            bool inside = (j>2 && j<30);
         set_color(WHITE, BLACK);
-        if (i == 1 && j>2 && j<30) set_color(YELLOW, BLACK);
-        else if (i == 3 && j>2 && j<30 || i == 4 && j>2 && j<30) set_color(GREEN, BLACK);
-        else if (i == 5 && j>2 && j<30) set_color(BLUE, BLACK);
-        else if (i == 6 && j>2 && j<30) set_color(RED, BLACK);
+        if (i == 1 &&inside) set_color(YELLOW, BLACK);
+        else if (i == 3 && inside || i == 4 && inside) set_color(GREEN, BLACK);
+        else if (i == 5 && inside) set_color(BLUE, BLACK);
+        else if (i == 6 && inside) set_color(RED, BLACK);
         else set_color(WHITE, BLACK);
         printf("%c", menu[i][j]);
         }
@@ -147,7 +119,8 @@ void menu(void) {
     }
 }
 
-bool print_map(char map[xmax][ymax], int level, int life, int score, int timeremaining, int turnsleft, int squareleft, int triangleleft, int circleleft) {
+
+bool print_map(char map[ymax][xmax], int stats[8]) {
     // Top coordinate header
     set_color(WHITE, BLACK);
     printf("   ");
@@ -155,7 +128,7 @@ bool print_map(char map[xmax][ymax], int level, int life, int score, int timerem
     printf("\n");
     for (int y = 0; y < ymax; y++) {
         for (int x = 0; x < xmax; x++) {
-            char c = map[x][y];
+            char c = map[y][x];
             set_color(WHITE, BLACK);
             if (c == CIRCLE) {
                 set_color(BLUE, BLACK);
@@ -171,26 +144,11 @@ bool print_map(char map[xmax][ymax], int level, int life, int score, int timerem
                 printf("▩ ");
             }
         }
-        stat(y, level, life, score, timeremaining, turnsleft, squareleft, triangleleft, circleleft);
+        stat(y, stats);
         printf("\n");
     }
     set_color(WHITE, BLACK);
     return true;
-}
-
-void print_stats(int level, int life, int score, int timeremaining, int turnsleft, int squareleft, int triangleleft, int circleleft) {
-    set_color(GREEN, BLACK);
-    printf("Score: %d\n", score);
-    set_color(MAGENTA, BLACK);
-    printf("Level: %d\tLives: %d\n", level, life);
-    set_color(RED, BLACK);
-    printf("Time: %d\tTurns: %d\n", timeremaining, turnsleft);
-    set_color(YELLOW, BLACK);
-    printf("Squares left: %d\n", squareleft);
-    set_color(GREEN, BLACK);
-    printf("Triangles left: %d\n", triangleleft);
-    set_color(BLUE, BLACK);
-    printf("Circles left: %d\n", circleleft);
 }
 
 void saveprogress(int level) {
@@ -260,15 +218,16 @@ int main() {
     show_cursor();
     gotoxy(0,0);
     SetConsoleOutputCP(65001);
-    int level = 1, life = 3, score = 0, timeremaining = 60, turnsleft = 20;
+    int level = 1, life = 3, score = 0, timeremaining = 60, turnsleft = 20 ,squareleft = 50, triangleleft = 50 , circleleft = 50;
+    int stats[8] = {level, life, score, timeremaining, turnsleft, squareleft, triangleleft, circleleft};
     bool gameover = false;
-    int squareleft = 50, triangleleft = 50 , circleleft = 50;
-    char map[xmax][ymax];
+  
+    char map[ymax][xmax];
     srand(time(NULL));
     menu();
     leveload();
     generate_map(map);
-    gameover = print_map(map, level, life, score, timeremaining, turnsleft, squareleft, triangleleft, circleleft);
+    gameover = print_map(map, stats);
     endscreen(gameover,level);
     return 0;
 }
