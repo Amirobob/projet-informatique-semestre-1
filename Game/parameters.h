@@ -1,3 +1,11 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
+#include <conio.h>
+#include <stdbool.h>
+#include "affichage_console.h"
+
 //square grid size
 #define xmax 20
 #define ymax 10
