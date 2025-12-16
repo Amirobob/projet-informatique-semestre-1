@@ -1,5 +1,10 @@
 #include "jeu.h"
 
+void playgame(void) {
+    // Placeholder
+}
+
+
 void generate_map(char map[ymax][xmax]) {
     int temp;
     for (int y = 0; y < ymax; y++) {
@@ -21,10 +26,8 @@ void generate_map(char map[ymax][xmax]) {
     do{
         for (int y = 1; y < ymax - 2; y++) {
             for (int x = 1; x < xmax - 2; x++) {
-                bool horizontal = (x <= xmax - 2 && map[y][x] == map[y][x+1] && map[y][x] == map[y][x+2]);
+                bool horizontal = (x <= xmax - 3 && map[y][x] == map[y][x+1] && map[y][x] == map[y][x+2]);
                 bool vertical = (y <= ymax - 3 && map[y][x] == map[y+1][x] && map[y][x] == map[y+2][x]);
-                bool diagonal_dr = (y <= ymax - 2 && x <= xmax - 2 && map[y][x] == map[y+1][x+1] && map[y][x] == map[y+2][x+2]);
-                bool diagonal_dl = (y <= ymax - 2 && x <= xmax - 2 && map[y][x] == map[y+1][x-1] && map[y][x] == map[y+2][x-2]);
                 // Horizontal
                 if (horizontal) {
                     shapepick(map, x, y,1);
@@ -33,14 +36,6 @@ void generate_map(char map[ymax][xmax]) {
                 if (vertical) {
                     shapepick(map, x, y,2);
                 }
-                // Diagonal down-right
-                if (diagonal_dr) {
-                    shapepick(map, x, y,3);
-                }
-                // Diagonal down-left
-                if (diagonal_dl) {
-                    shapepick(map, x, y,4);
-                }
             }
         }
         passes++;
@@ -48,9 +43,33 @@ void generate_map(char map[ymax][xmax]) {
 }
 
 char shapepick(char map[ymax][xmax], int x, int y, int direction) {
+    int temp;
     switch (direction) {
-        // this is very frustrating, I am taking a break
-        // MUST DO A DO WHILE!!!!!
+        case 1: // Horizontal
+            do {
+                // Assign random shapes to all three
+                for (int i = 0; i < 3; i++) {
+                    temp = rand() % 3;
+                    switch (temp) {
+                        case 0: map[y][x+i] = CIRCLE; break;
+                        case 1: map[y][x+i] = SQUARE; break;
+                        case 2: map[y][x+i] = TRIANGLE; break;
+                    }
+                }
+            } while (map[y][x] == map[y][x+1] && map[y][x] == map[y][x+2]);
+            break;
+        case 2: // Vertical
+            do {
+                for (int i = 0; i < 3; i++) {
+                    temp = rand() % 3;
+                    switch (temp) {
+                        case 0: map[y+i][x] = CIRCLE; break;
+                        case 1: map[y+i][x] = SQUARE; break;
+                        case 2: map[y+i][x] = TRIANGLE; break;
+                    }
+                }
+            } while (map[y][x] == map[y+1][x] && map[y][x] == map[y+2][x]);
+            break;
     }
-    map[y][x] = CIRCLE ? SQUARE : SQUARE ? TRIANGLE : CIRCLE;
+    return 0;
 }

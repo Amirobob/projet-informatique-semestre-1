@@ -7,8 +7,8 @@
 #include "affichage_console.h"
 
 //square grid size
-#define xmax 20
-#define ymax 10
+#define xmax 27
+#define ymax 47
 
 // Shapes, we cannot change them to symbols here cuz switch case is annoying as hell
 #define CIRCLE 'c'

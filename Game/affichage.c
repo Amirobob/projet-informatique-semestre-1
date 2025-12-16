@@ -46,8 +46,12 @@ void endscreen(bool gameover, int level) {
 }
 
 
-void menu(void) {
+int menu(void) {
+    // setup
     set_color(WHITE, BLACK);
+    char input = 0;
+    int selected = 3; 
+    const int min_select = 3, max_select = 6;
     char menu[9][32] = {
         "|-----------------------------|",
         "|         ECE Heroes!         |",
@@ -58,20 +62,36 @@ void menu(void) {
         "|       4. Exit               |",
         "|-----------------------------|"
     };
-    for (int i = 0; i < 9; i++) {
-        for (int j = 0; j<32; j++) {
-            bool inside = (j>2 && j<30);
-        set_color(WHITE, BLACK);
-        if (i == 1 &&inside) set_color(YELLOW, BLACK);
-        else if (i == 3 && inside || i == 4 && inside) set_color(GREEN, BLACK);
-        else if (i == 5 && inside) set_color(BLUE, BLACK);
-        else if (i == 6 && inside) set_color(RED, BLACK);
-        else set_color(WHITE, BLACK);
-        printf("%c", menu[i][j]);
+
+    // menu select
+    int running = 1;
+    while (running) {
+        clrscr();
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 32; j++) {
+                bool inside = (j > 2 && j < 30);
+
+                if (i == selected && inside) set_color(BLACK, WHITE);
+                else if (i == 1 && inside) set_color(YELLOW, BLACK);
+                else if ((i == 3 && inside) || (i == 4 && inside)) set_color(GREEN, BLACK);
+                else if (i == 5 && inside) set_color(BLUE, BLACK);
+                else if (i == 6 && inside) set_color(RED, BLACK);
+                else set_color(WHITE, BLACK);
+                printf("%c", menu[i][j]);
+            }
+            printf("\n");
         }
-        printf("\n");
+        // Wait for key press
+        while (!kbhit()) {}
+        input = getch();
+        if (input == 's' && selected < max_select) selected++;
+        else if (input == 'w' && selected > min_select) selected--;
+        else if (input == '\n' || input == ' ') running = 0;
     }
+    return selected;
 }
+
+
 
 void stat(int y,int stats[8]){
     switch(y) {
@@ -103,6 +123,9 @@ void stat(int y,int stats[8]){
 }
 
 
+
+
+
 bool print_map(char map[ymax][xmax], int stats[8]) {
     // Top coordinate header
     set_color(WHITE, BLACK);
@@ -132,4 +155,16 @@ bool print_map(char map[ymax][xmax], int stats[8]) {
     }
     set_color(WHITE, BLACK);
     return true;
+}
+
+
+
+
+
+
+
+void instructions(void) {
+    clrscr();
+    set_color(WHITE, BLACK);
+    getch();
 }

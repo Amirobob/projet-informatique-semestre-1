@@ -13,13 +13,27 @@ int main() {
     int level = 1, life = 3, score = 0, timeremaining = 60, turnsleft = 20 ,squareleft = 50, triangleleft = 50 , circleleft = 50;
     int stats[8] = {level, life, score, timeremaining, turnsleft, squareleft, triangleleft, circleleft};
     bool gameover = false;
-  
     char map[ymax][xmax];
+    int i;
     srand(time(NULL));
-    menu();
-    leveload();
-    generate_map(map);
-    gameover = print_map(map, stats);
-    endscreen(gameover,level);
+    do{
+        i = menu();
+   switch (i) {
+        case 3:
+            playgame();
+            break;
+        case 4:
+            leveload();
+            break;
+        case 5:
+            instructions();
+            break;
+        case 6:
+            printf("Exiting game. Goodbye!\n");
+            return 0;
+        default:
+            break;
+        }
+    } while (1);
     return 0;
 }
