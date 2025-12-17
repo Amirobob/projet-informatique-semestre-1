@@ -124,10 +124,11 @@ void clear_type(char map[ymax][xmax], int stats[8], char c) {
 }
 
 void gravity(char map[ymax][xmax]) {
+    // Make pieces fall
     bool moved = true;
     while (moved) {
         moved = false;
-        for (int y = ymax - 3; y >= 1; y--) { // Start near bottom
+        for (int y = ymax - 3; y >= 1; y--) {
             for (int x = 1; x < xmax - 1; x++) {
                 if (map[y][x] != ' ' && map[y+1][x] == ' ') {
                     map[y+1][x] = map[y][x];
@@ -137,10 +138,19 @@ void gravity(char map[ymax][xmax]) {
             }
         }
     }
+    
+    // Fill all empty spaces from top
+    char types[] = {CIRCLE, SQUARE, TRIANGLE};
+    for (int x = 1; x < xmax - 1; x++) {
+        for (int y = 1; y < ymax - 1; y++) {
+            if (map[y][x] == ' ') {
+                map[y][x] = types[rand() % 3];
+            }
+        }
+    }
 }
 
-
-void destroy(char map[ymax][xmax], int stats[8]) {
+bool destroy(char map[ymax][xmax], int stats[8]) {
     bool destroyed = false;
     
     for (int y = 1; y < ymax - 1; y++) {
@@ -278,15 +288,8 @@ void destroy(char map[ymax][xmax], int stats[8]) {
         }
     }
     
-    if (destroyed) {
-        gravity(map);
-        destroy(map, stats); // Recurse
-    }
+return destroyed;
 }
-
-
-
-
 
 
 
@@ -352,9 +355,19 @@ int game_loop(int stats[7], char map[ymax][xmax]) {
                     break;
                 case ' ':  // Select
                     moveshape(map, cursor_x, cursor_y, stats);
-                    destroy(map, stats);
                     while (kbhit()) {  // Clear buffer
                         getch();
+                    }
+                    while (destroy(map, stats)) {
+                        clrscr();
+                        print_map(map, stats, cursor_x, cursor_y);
+                        Sleep(500); // Show destroyed
+                        
+                        gravity(map);
+                        
+                        clrscr();
+                        print_map(map, stats, cursor_x, cursor_y);
+                        Sleep(500); // Show after gravity
                     }
                     needs_redraw = true;
                     break;
