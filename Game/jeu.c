@@ -70,6 +70,227 @@ char shapepick(char map[ymax][xmax], int x, int y, int direction) {
     return 0;
 }
 
+void moveshape(char map[ymax][xmax], int x, int y, int stats[8]) {
+    char input;
+    
+    // Initial draw
+    clrscr();
+    print_map(map, stats, x, y);
+    
+    // Get input
+    input = getch();
+    
+    int new_x = x;
+    int new_y = y;
+    
+    switch (input) {
+        case 'w':
+            if (y > 1) new_y = y - 1;  // Up
+            break;
+        case 's':
+            if (y < ymax - 2) new_y = y + 1;  // Down
+            break;
+        case 'a':
+            if (x > 1) new_x = x - 1;  // Left
+            break;
+        case 'd':
+            if (x < xmax - 2) new_x = x + 1;  // Right
+            break;
+    }
+    // Swap
+    if (new_x != x || new_y != y) {
+        char temp = map[new_y][new_x];
+        map[new_y][new_x] = map[y][x];
+        map[y][x] = temp;
+        stats[4]--;
+    }
+} 
+
+// Helper function
+void clear_type(char map[ymax][xmax], int stats[8], char c) {
+    int count = 0;
+    for (int i = 1; i < ymax - 1; i++) {
+        for (int j = 1; j < xmax - 1; j++) {
+            if (map[i][j] == c) {
+                map[i][j] = ' ';
+                count++;
+            }
+        }
+    }
+    stats[2] += count;
+    if (c == SQUARE) stats[5] -= count;
+    else if (c == TRIANGLE) stats[6] -= count;
+    else if (c == CIRCLE) stats[7] -= count;
+}
+
+void gravity(char map[ymax][xmax]) {
+    bool moved = true;
+    while (moved) {
+        moved = false;
+        for (int y = ymax - 3; y >= 1; y--) { // Start near bottom
+            for (int x = 1; x < xmax - 1; x++) {
+                if (map[y][x] != ' ' && map[y+1][x] == ' ') {
+                    map[y+1][x] = map[y][x];
+                    map[y][x] = ' ';
+                    moved = true;
+                }
+            }
+        }
+    }
+}
+
+
+void destroy(char map[ymax][xmax], int stats[8]) {
+    bool destroyed = false;
+    
+    for (int y = 1; y < ymax - 1; y++) {
+        for (int x = 1; x < xmax - 1; x++) {
+            char c = map[y][x];
+            if (c == ' ') continue;
+            
+            // Horizontal 6
+            bool h6 = (x <= xmax - 7 && 
+                      map[y][x+1] == c && map[y][x+2] == c && 
+                      map[y][x+3] == c && map[y][x+4] == c && map[y][x+5] == c);
+            
+            // Vertical 6
+            bool v6 = (y <= ymax - 7 && 
+                      map[y+1][x] == c && map[y+2][x] == c && 
+                      map[y+3][x] == c && map[y+4][x] == c && map[y+5][x] == c);
+            
+            if (h6 || v6) {
+                clear_type(map, stats, c);
+                destroyed = true;
+                continue;
+            }
+            
+            // Cross 5x5
+            bool cross = (x >= 3 && x <= xmax - 4 && y >= 3 && y <= ymax - 4 &&
+                         map[y-2][x] == c && map[y-1][x] == c && 
+                         map[y+1][x] == c && map[y+2][x] == c &&
+                         map[y][x-2] == c && map[y][x-1] == c && 
+                         map[y][x+1] == c && map[y][x+2] == c);
+            
+            if (cross) {
+                int count = 0;
+                // Row clear
+                for (int j = 1; j < xmax - 1; j++) {
+                    if (map[y][j] == c) {
+                        map[y][j] = ' ';
+                        count++;
+                    }
+                }
+                // Column clear (skip already cleared center)
+                for (int i = 1; i < ymax - 1; i++) {
+                    if (map[i][x] == c) {
+                        map[i][x] = ' ';
+                        count++;
+                    }
+                }
+                stats[2] += count;
+                if (c == SQUARE) stats[5] -= count;
+                else if (c == TRIANGLE) stats[6] -= count;
+                else if (c == CIRCLE) stats[7] -= count;
+                destroyed = true;
+                continue;
+            }
+            
+            // Hollow square
+            bool square = (x <= xmax - 5 && y <= ymax - 5 &&
+                          map[y][x+1] == c && map[y][x+2] == c && map[y][x+3] == c &&
+                          map[y+1][x] == c && map[y+1][x+3] == c &&
+                          map[y+2][x] == c && map[y+2][x+3] == c &&
+                          map[y+3][x] == c && map[y+3][x+1] == c && 
+                          map[y+3][x+2] == c && map[y+3][x+3] == c);
+            
+            if (square) {
+                int count = 0;
+                int border_count = 0;
+                // Border clear
+                for (int i = 0; i < 4; i++) {
+                    if (map[y][x+i] != ' ') {
+                        map[y][x+i] = ' ';
+                        count++;
+                        border_count++;
+                    }
+                    if (map[y+3][x+i] != ' ') {
+                        map[y+3][x+i] = ' ';
+                        count++;
+                        border_count++;
+                    }
+                }
+                for (int i = 1; i < 3; i++) {
+                    if (map[y+i][x] != ' ') {
+                        map[y+i][x] = ' ';
+                        count++;
+                        border_count++;
+                    }
+                    if (map[y+i][x+3] != ' ') {
+                        map[y+i][x+3] = ' ';
+                        count++;
+                        border_count++;
+                    }
+                }
+                // Inside clear
+                for (int i = 1; i < 3; i++) {
+                    for (int j = 1; j < 3; j++) {
+                        if (map[y+i][x+j] != ' ') {
+                            char inside = map[y+i][x+j];
+                            map[y+i][x+j] = ' ';
+                            count++;
+                            if (inside == SQUARE) stats[5]--;
+                            else if (inside == TRIANGLE) stats[6]--;
+                            else if (inside == CIRCLE) stats[7]--;
+                        }
+                    }
+                }
+                stats[2] += count;
+                if (c == SQUARE) stats[5] -= border_count;
+                else if (c == TRIANGLE) stats[6] -= border_count;
+                else if (c == CIRCLE) stats[7] -= border_count;
+                destroyed = true;
+                continue;
+            }
+            
+            // Horizontal 4
+            bool h4 = (x <= xmax - 5 && 
+                      map[y][x+1] == c && map[y][x+2] == c && map[y][x+3] == c);
+            if (h4) {
+                for (int i = 0; i < 4; i++) map[y][x+i] = ' ';
+                destroyed = true;
+                stats[2] += 4;
+                if (c == SQUARE) stats[5] -= 4;
+                else if (c == TRIANGLE) stats[6] -= 4;
+                else if (c == CIRCLE) stats[7] -= 4;
+            }
+            
+            // Vertical 4
+            bool v4 = (y <= ymax - 5 && 
+                      map[y+1][x] == c && map[y+2][x] == c && map[y+3][x] == c);
+            if (v4) {
+                for (int i = 0; i < 4; i++) map[y+i][x] = ' ';
+                destroyed = true;
+                stats[2] += 4;
+                if (c == SQUARE) stats[5] -= 4;
+                else if (c == TRIANGLE) stats[6] -= 4;
+                else if (c == CIRCLE) stats[7] -= 4;
+            }
+        }
+    }
+    
+    if (destroyed) {
+        gravity(map);
+        destroy(map, stats); // Recurse
+    }
+}
+
+
+
+
+
+
+
+
 int game_loop(int stats[7], char map[ymax][xmax]) {
     int cursor_x = 0;
     int cursor_y = 0;
@@ -106,32 +327,35 @@ int game_loop(int stats[7], char map[ymax][xmax]) {
                     gamestate = 2; // Game lost
                     break;
                 case 'w':
-                    if (cursor_y > 0) {
+                    if (cursor_y > 1) {  // Border check
                         cursor_y--;
                         needs_redraw = true;
                     }
                     break;
                 case 's':
-                    if (cursor_y < ymax - 1) {
+                    if (cursor_y < ymax - 2) {  // Border check
                         cursor_y++;
                         needs_redraw = true;
                     }
                     break;
                 case 'a':
-                    if (cursor_x > 0) {
+                    if (cursor_x > 1) {  // Border check
                         cursor_x--;
                         needs_redraw = true;
                     }
                     break;
                 case 'd':
-                    if (cursor_x < xmax - 1) {
+                    if (cursor_x < xmax - 2) {  // Border check
                         cursor_x++;
                         needs_redraw = true;
                     }
                     break;
-                case ' ':
-                // not done yet
-                // dont forget to do stats[4]-- here
+                case ' ':  // Select
+                    moveshape(map, cursor_x, cursor_y, stats);
+                    destroy(map, stats);
+                    while (kbhit()) {  // Clear buffer
+                        getch();
+                    }
                     needs_redraw = true;
                     break;
             }
@@ -142,6 +366,12 @@ int game_loop(int stats[7], char map[ymax][xmax]) {
             print_map(map, stats, cursor_x, cursor_y);
         }
 
+        if (stats[1] <= 0 || stats[3] <= 0 || stats[4] <= 0) {
+            gamestate = 2; // Game lost
+        }
+        if (stats[5] <= 0 && stats[6] <= 0 && stats[7] <= 0) {
+            gamestate = 1; // Game won
+        }
         // put end conditions
         
     } while (gamestate == 0);
