@@ -126,30 +126,39 @@ void stat(int y,int stats[8]){
 
 
 
-bool print_map(char map[ymax][xmax], int stats[8]) {
-    // Top coordinate header
-    set_color(WHITE, BLACK);
-    printf("   ");
-    for (int x = 0; x < xmax; x++);
-    printf("\n");
+bool print_map(char map[ymax][xmax], int stats[8], int cursor_x, int cursor_y) {
+   
     for (int y = 0; y < ymax; y++) {
+        
         for (int x = 0; x < xmax; x++) {
             char c = map[y][x];
-            set_color(WHITE, BLACK);
+            
+            // Check if this position is under the cursor
+            bool is_cursor = (y == cursor_y && x == cursor_x);
+            
+            // Set background color FIRST based on cursor
+            int bg_color = is_cursor ? WHITE : BLACK;
+            
+            // Draw the candy with appropriate color and background
             if (c == CIRCLE) {
-                set_color(BLUE, BLACK);
+                set_color(BLUE, bg_color);
                 printf("● ");
             } else if (c == SQUARE) {
-                set_color(YELLOW, BLACK);
+                set_color(YELLOW, bg_color);
                 printf("■ ");
             } else if (c == TRIANGLE) {
-                set_color(GREEN, BLACK);
+                set_color(GREEN, bg_color);
                 printf("▲ ");
             } else if (c == '#') {
-                set_color(MAGENTA, BLACK);
+                set_color(MAGENTA, bg_color);
                 printf("▩ ");
+            } else {
+                set_color(WHITE, bg_color);
+                printf("  ");
             }
         }
+        
+        set_color(WHITE, BLACK); // Reset before printing stats
         stat(y, stats);
         printf("\n");
     }
