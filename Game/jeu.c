@@ -1,7 +1,15 @@
 #include "jeu.h"
+#include "affichage.h"
 
-void playgame(void) {
-    // Placeholder
+void playgame(int stats[], char map[ymax][xmax]) {
+    // stats numbers: 0: level, 1: life, 2: score, 3: timeremaining, 4: turnsleft, 5:squareleft, 6:triangleleft, 7:circleleft
+    generate_map(map);
+    switch(game_loop(stats, map)) { // I think it's called a helper function?
+        case 1: //gamewon!!!
+        break;
+        case 2: //gamelost :(
+        break;
+    }
 }
 
 
@@ -46,8 +54,7 @@ char shapepick(char map[ymax][xmax], int x, int y, int direction) {
     int temp;
     switch (direction) {
         case 1: // Horizontal
-            do {
-                // Assign random shapes to all three
+                do {
                 for (int i = 0; i < 3; i++) {
                     temp = rand() % 3;
                     switch (temp) {
@@ -72,4 +79,15 @@ char shapepick(char map[ymax][xmax], int x, int y, int direction) {
             break;
     }
     return 0;
+}
+
+int game_loop(int stats[7], char map[ymax][xmax]) {
+    int gamestate = 0;
+    
+    do {
+        print_map(map, stats);
+
+
+    } while (gamestate == 0);
+    return gamestate;
 }

@@ -10,8 +10,8 @@ int main() {
     show_cursor();
     gotoxy(0,0);
     SetConsoleOutputCP(65001); // UTF-8
-    int level = 1, life = 3, score = 0, timeremaining = 60, turnsleft = 20 ,squareleft = 50, triangleleft = 50 , circleleft = 50;
-    int stats[8] = {level, life, score, timeremaining, turnsleft, squareleft, triangleleft, circleleft};
+    int level = 0, life = 3, score = 0, timeremaining = 60, turnsleft = 20 ,squareleft = 50, triangleleft = 50 , circleleft = 50;
+    int stats[7] = {level, life, score, timeremaining, turnsleft, squareleft, triangleleft, circleleft};
     bool gameover = false;
     char map[ymax][xmax];
     int i;
@@ -20,7 +20,7 @@ int main() {
         i = menu();
    switch (i) {
         case 3:
-            playgame();
+            playgame(stats, map);
             break;
         case 4:
             leveload();
