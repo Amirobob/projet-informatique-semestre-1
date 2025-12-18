@@ -40,7 +40,7 @@ void leveload(void) {
         return;
     }
 
-    // Parcours du fichier ligne par ligne
+    // parcours le fichier ligne par ligne
     while (fgets(line, sizeof(line), f)) {
         sscanf(line, "%s %d %d %d %d %d %d %d %d",
                name_in_file,
