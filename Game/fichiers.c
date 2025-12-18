@@ -1,8 +1,7 @@
 #include "Fichiers.h"
 #define SAVEFILE "savegame.txt"
 
-
-void saveprogress(int level) {
+void saveprogress(int level, int stats[]) {
     char playername[50];
     set_color(WHITE, BLACK);
     printf("Enter your name to save progress: ");
@@ -27,8 +26,8 @@ void saveprogress(int level) {
 
 
 // charge progression d’un joueur
-void leveload(void) {
-    char playername[50], , line[200], name_in_file[50];
+void leveload(int stats[]) {
+    char playername[50], line[200], name_in_file[50];
     bool found = false;
     
     set_color(WHITE, BLACK);
@@ -44,8 +43,8 @@ void leveload(void) {
     while (fgets(line, sizeof(line), f)) {
         sscanf(line, "%s %d %d %d %d %d %d %d %d",
                name_in_file,
-               &stats[0], &stats[1], &stats[2], &stats[3], &stats[4],
-               &stats[5], &stats[6], &stats[7]);
+               stats[0], stats[1], stats[2], stats[3], stats[4],
+               stats[5], stats[6], stats[7]);
 
         if (strcmp(name_in_file, playername) == 0) {
             found = true;
@@ -55,7 +54,7 @@ void leveload(void) {
 
     fclose(f);
     
-    if (found) {
+    if (found) { // A FAIRE : Mettre le joueur en jeu
         printf("welcome back john doe! loading last level...\n");
     } else{
         printf("\n name not found, try again\n");

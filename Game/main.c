@@ -5,7 +5,7 @@
 
 
 
-int main() {
+int main() { // je sais pas si c'est necessaire de retoucher ceci, probablement oui
     clrscr();
     SetConsoleOutputCP(65001); // UTF-8
     int level = 0, life = 3, score = 0, timeremaining = 60, turnsleft = 20 ,squareleft = 50, triangleleft = 50 , circleleft = 50;
@@ -21,7 +21,7 @@ int main() {
             playgame(stats, map);
             break;
         case 4:
-            leveload();
+            leveload(stats);
             break;
         case 5:
             instructions();

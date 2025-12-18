@@ -70,7 +70,7 @@ char shapepick(char map[ymax][xmax], int x, int y, int direction) {
     return 0;
 }
 
-void moveshape(char map[ymax][xmax], int x, int y, int stats[8]) {
+void moveshape(char map[ymax][xmax], int x, int y, int stats[8]) { // pas besoin de toucher a ceci
     char input;
     
     // Initial draw
@@ -85,12 +85,14 @@ void moveshape(char map[ymax][xmax], int x, int y, int stats[8]) {
     
     switch (input) {
         case 'w':
+        case 'z':
             if (y > 1) new_y = y - 1;  // Up
             break;
         case 's':
             if (y < ymax - 2) new_y = y + 1;  // Down
             break;
         case 'a':
+        case 'q':
             if (x > 1) new_x = x - 1;  // Left
             break;
         case 'd':
@@ -107,7 +109,7 @@ void moveshape(char map[ymax][xmax], int x, int y, int stats[8]) {
 } 
 
 // Helper function
-void clear_type(char map[ymax][xmax], int stats[8], char c) {
+void clear_type(char map[ymax][xmax], int stats[8], char c) { // pas besoin de toucher a ceci
     int count = 0;
     for (int i = 1; i < ymax - 1; i++) {
         for (int j = 1; j < xmax - 1; j++) {
@@ -123,7 +125,7 @@ void clear_type(char map[ymax][xmax], int stats[8], char c) {
     else if (c == CIRCLE) stats[7] -= count;
 }
 
-void gravity(char map[ymax][xmax]) {
+void gravity(char map[ymax][xmax]) {  // pas besoin de toucher a ceci
     // Make pieces fall
     bool moved = true;
     while (moved) {
@@ -150,7 +152,7 @@ void gravity(char map[ymax][xmax]) {
     }
 }
 
-bool destroy(char map[ymax][xmax], int stats[8]) {
+bool destroy(char map[ymax][xmax], int stats[8]) {  // pas besoin de toucher a ceci
     bool destroyed = false;
     
     for (int y = 1; y < ymax - 1; y++) {
@@ -294,7 +296,7 @@ return destroyed;
 
 
 
-int game_loop(int stats[7], char map[ymax][xmax]) {
+int game_loop(int stats[7], char map[ymax][xmax]) { // on ne touche pas de base, mais il y a quelquechose pour apres
     int cursor_x = 0;
     int cursor_y = 0;
     
@@ -326,10 +328,8 @@ int game_loop(int stats[7], char map[ymax][xmax]) {
         if (kbhit()) {
             char input = getch();
             switch (input) {
-                case 'q':
-                    gamestate = 2; // Game lost
-                    break;
                 case 'w':
+                case 'z':
                     if (cursor_y > 1) {  // Border check
                         cursor_y--;
                         needs_redraw = true;
@@ -342,6 +342,7 @@ int game_loop(int stats[7], char map[ymax][xmax]) {
                     }
                     break;
                 case 'a':
+                case 'q':
                     if (cursor_x > 1) {  // Border check
                         cursor_x--;
                         needs_redraw = true;
@@ -393,7 +394,7 @@ int game_loop(int stats[7], char map[ymax][xmax]) {
 }
 
 
-void playgame(int stats[], char map[ymax][xmax]) {
+void playgame(int stats[], char map[ymax][xmax]) { // pas besoin de toucher a ceci
     // stats numbers: 0: level, 1: life, 2: score, 3: timeremaining, 4: turnsleft, 5:squareleft, 6:triangleleft, 7:circleleft
     generate_map(map);
     switch(game_loop(stats, map)) { // I think it's called a helper function?

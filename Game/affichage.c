@@ -1,6 +1,6 @@
 #include "affichage.h"
 
-void endscreen(bool gameover, int level) {
+void endscreen(bool gameover, int level) { // il faut afficher ces menus lorsque le jeu est fini, ils doivent etre navigables comme le menu principal, n'oubliez pas d'augmenter le niveau du jeu
     if (gameover) {
         char gameovermessage[][18] = {
             " _______________ ",
@@ -65,7 +65,7 @@ int menu(void) {
 
     // menu select
     int running = 1;
-    while (running) {
+    while (running) { // vous pouvez en vrai essayer de copy coller ce code pour faire un menu
         clrscr();
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 32; j++) {
@@ -85,7 +85,7 @@ int menu(void) {
         while (!kbhit()) {}
         input = getch();
         if (input == 's' && selected < max_select) selected++;
-        else if (input == 'w' && selected > min_select) selected--;
+        else if (input == 'w' && selected > min_select || input == 'z' && selected > min_select) selected--;
         else if (input == '\n' || input == ' ') running = 0;
     }
     return selected;
@@ -93,7 +93,7 @@ int menu(void) {
 
 
 
-void stat(int y,int stats[8]){
+void stat(int y,int stats[8]){ // ne touchez pas, celui ci est fait
     switch(y) {
         case 1:
         set_color(GREEN, BLACK);
@@ -126,7 +126,7 @@ void stat(int y,int stats[8]){
 
 
 
-bool print_map(char map[ymax][xmax], int stats[8], int cursor_x, int cursor_y) {
+bool print_map(char map[ymax][xmax], int stats[8], int cursor_x, int cursor_y) { // on peut rajouter des trucs apres, mais pas pour le moment
    
     for (int y = 0; y < ymax; y++) {
         
@@ -172,7 +172,7 @@ bool print_map(char map[ymax][xmax], int stats[8], int cursor_x, int cursor_y) {
 
 
 
-void instructions(void) {
+void instructions(void) { // ajouter des tutoriels ici pour expliquer le jeu, avec des printf et de photos si vous etes motivés
     clrscr();
     set_color(WHITE, BLACK);
     getch();
