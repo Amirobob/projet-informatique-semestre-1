@@ -45,7 +45,7 @@ void leveload(void) {
         sscanf(line, "%s %d %d %d %d %d %d %d %d",
                name_in_file,
                &stats[0], &stats[1], &stats[2], &stats[3], &stats[4],
-               &stats[5], &stats[6], &stats[7]);
+               &stats[5], &stats[6], &stats[7]); // sscanf lit depuis une chaîne de caractères
 
         if (strcmp(name_in_file, playername) == 0) {
             found = true;
