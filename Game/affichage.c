@@ -231,6 +231,7 @@ void instructions(void) { // ajouter des tutoriels ici pour expliquer le jeu, av
     printf("Utilise cette rapidite comme un atout !\n\n");
 
     set_color(YELLOW, BLACK);
-    printf("Appuyez sur une touche pour entrer dans la jungle...");
+    printf("BONNN ca commence à vraiment urgent que tu nous aide, on y va ? ");
+    printf("Clique si tu l'oses pour entrer dans la jungle ");
     getch();
 }
