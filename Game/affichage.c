@@ -174,6 +174,64 @@ bool print_map(char map[ymax][xmax], int stats[8], int cursor_x, int cursor_y) {
 
 void instructions(void) { // ajouter des tutoriels ici pour expliquer le jeu, avec des printf et de photos si vous etes motivés
     clrscr();
+    
+    // --- PARTIE 1 : L'accueil ---
+    set_color(CYAN, BLACK);
+    printf("Oh, tu es la... \n");
+    Sleep(1500);
+    printf("Je n'aurais pas pensé te voir ici. Je te pensais moins courageux...\n\n");
+    Sleep(1000);
+    
+    set_color(YELLOW, BLACK);
+    printf("MAIS...\n\n");
+    Sleep(1000);
+    
     set_color(WHITE, BLACK);
+    printf("Si on t'a envoyé ici, c'est qu'ils ont confiance en toi.\n");
+    printf("On va avoir besoin de ton aide, cher aventurier(e) !\n");
+    printf("Et puis, si tu es la, c'est que tu as reussi à survivre aux cours d'informatique\n");
+    printf("du vendredi apres-midi. Ils savent tres bien ce qu'ils font en t'envoyant la ");
+    set_color(YELLOW, BLACK); printf(":-) \n\n");
+    
+    set_color(WHITE, BLACK);
+    printf("Tu viens de poser le pied sur un terrain dangereux, mais on croit TOUS en toi.\n");
+    printf("Tu ne vas pas nous abandonner !!! C'est courageux (ou inconscient...).\n\n");
+    Sleep(2000);
+
+    // --- PARTIE 2 : L'ambiance ---
+    set_color(GREEN, BLACK);
+    printf("Cela ne va pas être de tout repos, les formes antiques n'ont pas envie de cooperer,\n");
+    printf("mais on compte sur toi pour nous aider a restaurer l'ordre.\n");
+    set_color(WHITE, BLACK);
+    printf("Ne t'inquiete pas, on te suivra de tres pres... enfin, surtout de tres loin,\n");
+    printf("bien a l'abri derriere nos ecrans pendant que tu transpires !\n\n");
+    
+    printf("On pourra meme te souffler des petites aides si tu as trop de mal...\n");
+    printf("Mais cela ne risque pas d'arriver !!! On ne t'a pas choisi au hasard !!!\n\n");
+    Sleep(2000);
+
+    // --- PARTIE 3 : L'explication du jeu ---
+    set_color(MAGENTA, BLACK);
+    printf("Ah, mais tu ne sais toujours pas pourquoi on t'a amené ici ?\n");
+    printf("Ils ne t'ont donc rien expliqué ?\n");
+    set_color(WHITE, BLACK);
+    printf("Bon mon cher ami, je vais t'expliquer tout ça rapidement car le temps presse !\n\n");
+    
+    printf("- Tu vas partir à la quete de pieces d'or.\n");
+    printf("- Tu vas affronter 3 niveaux, mais gare a toi, ils sont de plus en plus durs.\n");
+    printf("- Ton but : aligner des formes entre elles pour les faire disparaitre.\n");
+    printf("- Nous, on sera la pour te rappeler combien il en reste à combattre !\n\n");
+
+    set_color(CYAN, BLACK);
+    printf("Mais detrompe-toi, ce n'est pas si facile. Ton temps sera compte.\n");
+    printf("Une minute de gainage te semble longue ? Ici, elle semblera horriblement courte.\n");
+    printf("Alors, ne te fais pas avoir par le chrono !\n\n");
+
+    printf("On m'a dit que quand le cours est fini, tu es le premier a ranger tes affaires.\n");
+    printf("Utilise cette rapidite comme un atout !\n\n");
+
+    set_color(YELLOW, BLACK);
+    printf("BONNN ca commence à vraiment urgent que tu nous aide, on y va ? ");
+    printf("Clique si tu l'oses pour entrer dans la jungle ");
     getch();
 }
