@@ -119,7 +119,7 @@ void stat(int y,int stats[8]){ // ne touchez pas, celui ci est fait
             set_color(BLUE, BLACK);
             printf("   |Circles left: %d", stats[7]);
             break;
-    }
+    } 
 }
 
 
