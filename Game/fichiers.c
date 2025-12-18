@@ -14,7 +14,7 @@ void saveprogress(int level) {
         return;
     }
 
-    // On sauvegarde : pseudo + toutes les stats
+    // sauvegarde : pseudo + toutes les stats
     fprintf(f, "%s %d %d %d %d %d %d %d %d\n",
             playername,
             stats[0], stats[1], stats[2], stats[3], stats[4],
