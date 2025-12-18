@@ -54,9 +54,14 @@ void leveload(int stats[]) {
 
     fclose(f);
     
-    if (found) { // A FAIRE : Mettre le joueur en jeu
+    if (found) { // à continuer ? : Mettre le joueur en jeu
         printf("welcome back john doe! loading last level...\n");
-    } else{
+        
+        char map[ymax][xmax];
+        generate_map(map);
+        playgame(stats, map);  // lance la partie avec les stats chargées
+    
+    } else {
         printf("\n name not found, try again\n");
     }
     
