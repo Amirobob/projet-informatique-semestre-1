@@ -330,7 +330,7 @@ bool destroy(char map[ymax][xmax], int stats[10], int *star_chance) {
                     }
                 }
                 stats[2] += count;
-                *star_chance += count * 1;  // Increase star chance by 1% per block
+                *star_chance += count * 1;  // Incrementer par 1%
                 if (*star_chance > 99) *star_chance = 99;
                 if (c == SQUARE && stats[5] > 0) stats[5] -= count;
                 else if (c == TRIANGLE && stats[6] > 0) stats[6] -= count;

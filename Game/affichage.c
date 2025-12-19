@@ -7,7 +7,7 @@ int endscreen(bool gameover, int level, int life) {
     const int min_select = 0;
     const int max_select = 2;
     
-    // Define both menus
+    // Define both menus , ces menus viennent du https://www.asciiart.eu/miscellaneous/boxes (“A box in a box” - auteur non specifié)
     char gameover_menu[13][18] = {
         " _______________ ",
         "|  ___________  |",
@@ -16,11 +16,11 @@ int endscreen(bool gameover, int level, int life) {
         "|_______________|",
         " Meilleure fois!",
         " ________________",
-        "|   Reessayer   |",
+        "|   Reessayer    |",
         "|________________|",
-        "|sauver niveau  |",
+        "|sauver niveau   |",
         "|________________|",
-        "|    Quitter    |",
+        "|    Quitter     |",
         "|________________|"
     };
     
@@ -32,11 +32,11 @@ int endscreen(bool gameover, int level, int life) {
         "|_______________________________|",
         "                                ",
         "       ________________         ",
-        "      | Niveau suivant|        ",
+        "      | Niveau suivant |        ",
         "      |________________|        ",
-        "      |Sauver progres |        ",
+        "      |Sauver progres  |        ",
         "      |________________|        ",
-        "      |    Quitter    |        ",
+        "      |    Quitter     |        ",
         "      |________________|        "
     };
     char wonforgood[13][34] = {
@@ -47,11 +47,11 @@ int endscreen(bool gameover, int level, int life) {
         "|_______________________________|",
         "                                ",
         "       ________________         ",
-        "      |  Mode infini  |        ",
+        "      |  Mode infini   |        ",
         "      |________________|        ",
-        "      |Sauver progres |        ",
+        "      |Sauver progres  |        ",
         "      |________________|        ",
-        "      |    Quitter    |        ",
+        "      |    Quitter     |        ",
         "      |________________|        "
     };
     char doneforgood[9][18] = {
@@ -62,7 +62,7 @@ int endscreen(bool gameover, int level, int life) {
         "|_______________|",
         "Plus de vies!   ",
         " ________________",
-        "|    Quitter    |",
+        "|    Quitter     |",
         "|________________|",
     };
     int running = 1;
@@ -261,7 +261,7 @@ void stat(int y, int stats[10]){
 bool print_map(char map[ymax][xmax], int stats[10], int cursor_x, int cursor_y) {  // Changed from stats[8] to stats[10]
    
     // Get current time for star color animation (changes every second)
-    time_t current_time = time(NULL);
+    time_t current_time = time(NULL); // aide de claude pour savoir comment faire une compte à rebours
     int color_cycle = (int)(current_time % 6); // 6 colors cycle
     int star_colors[] = {RED, YELLOW, GREEN, CYAN, BLUE, MAGENTA};
     int star_color = star_colors[color_cycle];
@@ -400,7 +400,7 @@ void instructions(void) { // ajouter des tutoriels ici pour expliquer le jeu, av
     printf("Appuie sur une touche pour commencer...");
     getch();
     
-    // Création du mini-terrain 4x2 (avec bordures = 6x4)
+    // Création du mini-terrain 4x2
     #define TUTORIAL_WIDTH 6
     #define TUTORIAL_HEIGHT 4
     char tutorial_map[TUTORIAL_HEIGHT][TUTORIAL_WIDTH] = {
@@ -474,7 +474,7 @@ void instructions(void) { // ajouter des tutoriels ici pour expliquer le jeu, av
         
         if (won) {
             set_color(GREEN, BLACK);
-            printf("\n   ★ BRAVO ! Tu as aligné 4 carrés ! ★\n");
+            printf("\n    BRAVO ! Tu as aligné 4 carrés ! \n");
             set_color(WHITE, BLACK);
             printf("   Tu es prêt pour la vraie aventure !\n");
             printf("\n   Appuie sur une touche pour continuer...");
@@ -562,7 +562,7 @@ void instructions(void) { // ajouter des tutoriels ici pour expliquer le jeu, av
     clrscr();
     set_color(GREEN, BLACK);
     printf("\n\n   Parfait ! Tu es maintenant prêt pour l'aventure !\n");
-    printf("   N'oublie pas : courage et persévérance sont tes meilleurs alliés.\n");
+    printf("   N'oublies pas : sois courageux!.\n");
     printf("   dans le fôret il existe des combinaisons des carrés et même l'élusive suite de 6...\n\n");
     set_color(WHITE, BLACK);
     printf("   Bonne chance, héros !\n\n");
