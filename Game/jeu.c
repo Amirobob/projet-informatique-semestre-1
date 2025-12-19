@@ -267,6 +267,45 @@ bool destroy(char map[ymax][xmax], int stats[10], int *star_chance) {
                 continue;
             }
             
+            // 3x3 Filled Square - eliminates 6x6 area
+            bool filled_3x3 = (x <= xmax - 4 && y <= ymax - 4 &&
+                              map[y][x+1] == c && map[y][x+2] == c &&
+                              map[y+1][x] == c && map[y+1][x+1] == c && map[y+1][x+2] == c &&
+                              map[y+2][x] == c && map[y+2][x+1] == c && map[y+2][x+2] == c);
+            
+            if (filled_3x3) {
+                // Calculate center of 3x3 (which is at x+1, y+1)
+                int center_x = x + 1;
+                int center_y = y + 1;
+                
+                // Eliminate 6x6 area around center (-2 to +3 from center)
+                int count = 0;
+                for (int dy = -2; dy <= 3; dy++) {
+                    for (int dx = -2; dx <= 3; dx++) {
+                        int nx = center_x + dx;
+                        int ny = center_y + dy;
+                        if (nx >= 1 && nx < xmax - 1 && ny >= 1 && ny < ymax - 1) {
+                            char block = map[ny][nx];
+                            if (block != ' ' && block != '#' && block != STAR) {
+                                map[ny][nx] = ' ';
+                                count++;
+                                // Update shape counters
+                                if (block == SQUARE && stats[5] > 0) stats[5]--;
+                                else if (block == TRIANGLE && stats[6] > 0) stats[6]--;
+                                else if (block == CIRCLE && stats[7] > 0) stats[7]--;
+                                else if (block == DIAMOND && stats[8] > 0) stats[8]--;
+                                else if (block == HEXAGON && stats[9] > 0) stats[9]--;
+                            }
+                        }
+                    }
+                }
+                stats[2] += count * 3; // Triple points for this powerful combo!
+                *star_chance += count * 1;
+                if (*star_chance > 99) *star_chance = 99;
+                destroyed = true;
+                continue;
+            }
+            
             // Cross 5x5
             bool cross = (x >= 3 && x <= xmax - 4 && y >= 3 && y <= ymax - 4 &&
                          map[y-2][x] == c && map[y-1][x] == c && 
