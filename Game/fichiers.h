@@ -1,4 +1,4 @@
 #include "parameters.h"
 
-void saveprogress(int level, int stats[]);
+void saveprogress(int stats[]);
 void leveload(int stats[]);

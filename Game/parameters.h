@@ -16,3 +16,4 @@
 #define SQUARE 's'
 #define DIAMOND 'd'
 #define HEXAGON 'h'
+#define STAR '*'  // Special power block that changes color

@@ -16,7 +16,7 @@ int load_all_players(Player players[]) {
     
     int count = 0;
     while (count < MAX_PLAYERS && 
-           fscanf(f, "%49s %d %d %d %d %d %d %d %d %d %d",  // Added 2 more %d
+           fscanf(f, "%49s %d %d %d %d %d %d %d %d %d %d",  
                   players[count].name,
                   &players[count].stats[0],
                   &players[count].stats[1],
@@ -26,8 +26,8 @@ int load_all_players(Player players[]) {
                   &players[count].stats[5],
                   &players[count].stats[6],
                   &players[count].stats[7],
-                  &players[count].stats[8],  // Diamond
-                  &players[count].stats[9]) == 11) {  // Hexagon, changed 9 to 11
+                  &players[count].stats[8],
+                  &players[count].stats[9]) == 11) {
         count++;
     }
     fclose(f);
@@ -66,39 +66,41 @@ int find_player(Player players[], int count, const char *name) {
 }
 
 // Save (only new players)
-void saveprogress(int level, int stats[]) {
+void saveprogress(int stats[]) {
+    int exit = 0;
     char playername[50];
     Player players[MAX_PLAYERS];
-    
-    set_color(WHITE, BLACK);
-    printf("Enter your name to save progress: ");
-    scanf("%49s", playername);
-    
-    int count = load_all_players(players);
-    int index = find_player(players, count, playername);
-    
-    if (index >= 0) {
-        printf("Username '%s' already exists! Choose another name.\n", playername);
-        getch();
-        return;
-    }
-    
-    // Add new player
-    if (count >= MAX_PLAYERS) {
-        printf("Player limit reached!\n");
-        getch();
-        return;
-    }
-    
-    strcpy(players[count].name, playername);
-    for (int i = 0; i < 10; i++) {
-        players[count].stats[i] = stats[i];
-    }
-    count++;
-    
-    save_all_players(players, count);
-    printf("Progress saved for new player '%s'!\n", playername);
-    getch();
+    do {
+        set_color(WHITE, BLACK);
+        printf("Enter your name to save progress: ");
+        scanf("%49s", playername);
+        
+        int count = load_all_players(players);
+        int index = find_player(players, count, playername);
+        
+        if (index >= 0) {
+            printf("Username '%s' already exists! Choose another name.\n", playername);
+            getch();
+        }
+        
+        // Add new player
+        else if (count >= MAX_PLAYERS) {
+            printf("Player limit reached!\n");
+            getch();
+        }
+        else {
+            strcpy(players[count].name, playername);
+            for (int i = 0; i < 10; i++) {
+                players[count].stats[i] = stats[i];
+            }
+            count++;
+        
+            save_all_players(players, count);
+            printf("Progress saved for new player '%s'!\n", playername);
+            getch();
+            exit = 1;
+        }
+    } while (exit == 0);
 }
 
 // Load (existing only)

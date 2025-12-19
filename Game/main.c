@@ -26,7 +26,6 @@ int main() { // je sais pas si c'est necessaire de retoucher ceci, probablement 
             // réinitialisation des stats pour une nouvelle partie
             stats[0] = 0;   // level
             stats[1] = 3;   // life
-            stats[2] = 0;   // score
             difficulty(stats);
             playgame(stats, map);
             break;

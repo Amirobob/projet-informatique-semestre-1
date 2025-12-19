@@ -39,6 +39,21 @@ int endscreen(bool gameover, int level, int life) {
         "      |   leave game   |        ",
         "      |________________|        "
     };
+    char wonforgood[13][34] = {
+        " _______________________________ ",
+        "|  ___________________________  |",
+        "| |  You finished the game !  | |",
+        "| |___________________________| |",
+        "|_______________________________|",
+        "                                ",
+        "       ________________         ",
+        "      |  endless mode  |        ",
+        "      |________________|        ",
+        "      | save progress  |        ",
+        "      |________________|        ",
+        "      |   leave game   |        ",
+        "      |________________|        "
+    };
     char doneforgood[9][18] = {
         " _______________ ",
         "|  ___________  |",
@@ -53,7 +68,33 @@ int endscreen(bool gameover, int level, int life) {
     int running = 1;
     while (running) {
         clrscr();
-        if (gameover && life == 0) {
+        if (!gameover && level == 3) {
+            for (int i = 0; i < 13; i++) {
+                for (int j = 0; j < 34; j++) {
+                    if (i >= 0 && i <= 4) {
+                        set_color(GREEN, BLACK);
+                    }
+                    else if (i == 5) {
+                        set_color(WHITE, BLACK);
+                    }
+                    else if (i > 6 && i <= 8 && selected == 0 && j > 6 && j < 23) {
+                        set_color(BLACK, WHITE);
+                    }
+                    else if (i >= 9 && i <= 10 && selected == 1 && j > 6 && j < 23) {
+                        set_color(BLACK, WHITE);
+                    }
+                    else if (i >= 11 && i <= 12 && selected == 2 && j > 6 && j < 23) {
+                        set_color(BLACK, WHITE);
+                    }
+                    else {
+                        set_color(WHITE, BLACK);
+                    }
+                    printf("%c", wonforgood[i][j]);
+                }
+                printf("\n");
+            }
+        }
+        else if (gameover && life == 0) {
             for (int i = 0; i < 9; i++) {
                 for (int j = 0; j < 18; j++) {
                     if (i <= 4) {
@@ -66,7 +107,7 @@ int endscreen(bool gameover, int level, int life) {
                 }
                 printf("\n");
             }
-            getch();
+            while (getch() != ' ') {}
             return 2;
         }
         else if (gameover) {
@@ -78,13 +119,13 @@ int endscreen(bool gameover, int level, int life) {
                     else if (i == 5) {
                         set_color(WHITE, BLACK);
                     }
-                    else if (i > 6 && i <= 8 && selected == 0 && j > 1 && j < 16) {
+                    else if (i > 6 && i <= 8 && selected == 0 && j > 0 && j < 17) {
                         set_color(BLACK, WHITE);
                     }
-                    else if (i >= 9 && i <= 10 && selected == 1 && j > 1 && j < 16) {
+                    else if (i >= 9 && i <= 10 && selected == 1 && j > 0 && j < 17) {
                         set_color(BLACK, WHITE);
                     }
-                    else if (i >= 11 && i <= 12 && selected == 2 && j > 1 && j < 16) {
+                    else if (i >= 11 && i <= 12 && selected == 2 && j > 0 && j < 17) {
                         set_color(BLACK, WHITE);
                     }
                     else {
@@ -103,7 +144,7 @@ int endscreen(bool gameover, int level, int life) {
                     else if (i == 5) {
                         set_color(WHITE, BLACK);
                     }
-                    else if (i >= 6 && i <= 8 && selected == 0 && j > 6 && j < 23) {
+                    else if (i > 6 && i <= 8 && selected == 0 && j > 6 && j < 23) {
                         set_color(BLACK, WHITE);
                     }
                     else if (i >= 9 && i <= 10 && selected == 1 && j > 6 && j < 23) {
@@ -187,7 +228,7 @@ void stat(int y, int stats[10]) {  // Changed from stats[8] to stats[10]
             break;
         case 2:
             set_color(MAGENTA, BLACK);
-            printf("   |Level: %d\tLives: %d", stats[0], stats[1]);
+            printf("   |Level: %d\tLives: %d", stats[0]+1, stats[1]);
             break;
         case 3:
             set_color(RED, BLACK);
@@ -219,6 +260,12 @@ void stat(int y, int stats[10]) {  // Changed from stats[8] to stats[10]
 
 bool print_map(char map[ymax][xmax], int stats[10], int cursor_x, int cursor_y) {  // Changed from stats[8] to stats[10]
    
+    // Get current time for star color animation (changes every second)
+    time_t current_time = time(NULL);
+    int color_cycle = (int)(current_time % 6); // 6 colors cycle
+    int star_colors[] = {RED, YELLOW, GREEN, CYAN, BLUE, MAGENTA};
+    int star_color = star_colors[color_cycle];
+    
     for (int y = 0; y < ymax; y++) {
         
         for (int x = 0; x < xmax; x++) {
@@ -243,6 +290,9 @@ bool print_map(char map[ymax][xmax], int stats[10], int cursor_x, int cursor_y) 
             } else if (c == HEXAGON) {  // Added hexagon
                 set_color(CYAN, bg_color);
                 printf("⬡ ");
+            } else if (c == STAR) {  // Special star block with color animation
+                set_color(star_color, bg_color);
+                printf("★ ");
             } else if (c == '#') {
                 set_color(MAGENTA, bg_color);
                 printf("▩ ");
@@ -327,6 +377,195 @@ void instructions(void) { // ajouter des tutoriels ici pour expliquer le jeu, av
 
     set_color(YELLOW, BLACK);
     printf("BONNN ca commence à vraiment urgent que tu nous aide, on y va ? ");
-    printf("Clique si tu l'oses pour entrer dans la jungle ");
+    printf("Clique pour continuer...");
+    getch();
+    
+    // --- PARTIE 4 : DEMO INTERACTIVE ---
+    clrscr();
+    set_color(CYAN, BLACK);
+    printf("\n=== DEMO INTERACTIVE - Entraîne-toi ! ===\n\n");
+    set_color(WHITE, BLACK);
+    printf("Avant de partir, essayons ensemble sur un petit terrain d'entrainement.\n");
+    printf("C'est un espace 4x2, parfait pour comprendre les bases.\n\n");
+    
+    printf("Contrôles :\n");
+    printf("  - ZQSD pour déplacer le curseur\n");
+    printf("  - ESPACE pour échanger deux formes adjacentes\n");
+    printf("  - Aligne 4 formes identiques (horizontalement ou verticalement)\n");
+    printf("  - ESC pour quitter le tutoriel\n\n");
+    
+    set_color(GREEN, BLACK);
+    printf("Objectif : Aligne les carrés jaunes ! ■ ■ ■ ■\n\n");
+    set_color(WHITE, BLACK);
+    printf("Appuie sur une touche pour commencer...");
+    getch();
+    
+    // Création du mini-terrain 4x2 (avec bordures = 6x4)
+    #define TUTORIAL_WIDTH 6
+    #define TUTORIAL_HEIGHT 4
+    char tutorial_map[TUTORIAL_HEIGHT][TUTORIAL_WIDTH] = {
+        {'#', '#', '#', '#', '#', '#'},
+        {'#', 's', 's', 'c', 's', '#'},
+        {'#', 't', 's', 'c', 't', '#'},
+        {'#', '#', '#', '#', '#', '#'}
+    };
+    
+    int t_cursor_x = 1;
+    int t_cursor_y = 1;
+    bool tutorial_running = true;
+    int moves = 0;
+    
+    while (tutorial_running) {
+        clrscr();
+        
+        // Affichage du titre
+        set_color(CYAN, BLACK);
+        printf("=== TERRAIN D'ENTRAINEMENT ===\n\n");
+        
+        // Affichage de la grille
+        for (int y = 0; y < TUTORIAL_HEIGHT; y++) {
+            printf("   ");
+            for (int x = 0; x < TUTORIAL_WIDTH; x++) {
+                char c = tutorial_map[y][x];
+                bool is_cursor = (y == t_cursor_y && x == t_cursor_x);
+                int bg_color = is_cursor ? WHITE : BLACK;
+                
+                if (c == CIRCLE) {
+                    set_color(BLUE, bg_color);
+                    printf("● ");
+                } else if (c == SQUARE) {
+                    set_color(YELLOW, bg_color);
+                    printf("■ ");
+                } else if (c == TRIANGLE) {
+                    set_color(GREEN, bg_color);
+                    printf("▲ ");
+                } else if (c == '#') {
+                    set_color(MAGENTA, bg_color);
+                    printf("▩ ");
+                } else {
+                    set_color(WHITE, bg_color);
+                    printf("  ");
+                }
+            }
+            set_color(WHITE, BLACK);
+            printf("\n");
+        }
+        
+        printf("\n");
+        set_color(WHITE, BLACK);
+        printf("   Mouvements effectués : %d\n", moves);
+        set_color(YELLOW, BLACK);
+        printf("   Astuce : Échange le cercle avec un carré !\n");
+        set_color(WHITE, BLACK);
+        printf("   [ESC] pour quitter\n");
+        
+        // Vérifier si le joueur a gagné (4 carrés alignés horizontalement)
+        bool won = false;
+        for (int y = 1; y < TUTORIAL_HEIGHT - 1; y++) {
+            for (int x = 1; x <= TUTORIAL_WIDTH - 4; x++) {
+                if (tutorial_map[y][x] == 's' && 
+                    tutorial_map[y][x+1] == 's' && 
+                    tutorial_map[y][x+2] == 's' && 
+                    tutorial_map[y][x+3] == 's') {
+                    won = true;
+                }
+            }
+        }
+        
+        if (won) {
+            set_color(GREEN, BLACK);
+            printf("\n   ★ BRAVO ! Tu as aligné 4 carrés ! ★\n");
+            set_color(WHITE, BLACK);
+            printf("   Tu es prêt pour la vraie aventure !\n");
+            printf("\n   Appuie sur une touche pour continuer...");
+            getch();
+            tutorial_running = false;
+            break;
+        }
+        
+        // Gestion des entrées
+        char input = getch();
+        int new_x = t_cursor_x;
+        int new_y = t_cursor_y;
+        
+        switch (input) {
+            case 27: // ESC
+                tutorial_running = false;
+                break;
+            case 'w':
+            case 'z':
+                if (t_cursor_y > 1) new_y = t_cursor_y - 1;
+                break;
+            case 's':
+                if (t_cursor_y < TUTORIAL_HEIGHT - 2) new_y = t_cursor_y + 1;
+                break;
+            case 'q':
+            case 'a':
+                if (t_cursor_x > 1) new_x = t_cursor_x - 1;
+                break;
+            case 'd':
+                if (t_cursor_x < TUTORIAL_WIDTH - 2) new_x = t_cursor_x + 1;
+                break;
+            case ' ':
+                // Demander dans quelle direction échanger
+                clrscr();
+                printf("\n\n   Dans quelle direction échanger ?\n");
+                printf("   [Z]Haut [S]Bas [Q]Gauche [D]Droite [ESC]Annuler\n");
+                char dir = getch();
+                int swap_x = t_cursor_x;
+                int swap_y = t_cursor_y;
+                bool valid_swap = false;
+                
+                switch (dir) {
+                    case 'w':
+                    case 'z':
+                        if (t_cursor_y > 1) {
+                            swap_y = t_cursor_y - 1;
+                            valid_swap = true;
+                        }
+                        break;
+                    case 's':
+                        if (t_cursor_y < TUTORIAL_HEIGHT - 2) {
+                            swap_y = t_cursor_y + 1;
+                            valid_swap = true;
+                        }
+                        break;
+                    case 'q':
+                    case 'a':
+                        if (t_cursor_x > 1) {
+                            swap_x = t_cursor_x - 1;
+                            valid_swap = true;
+                        }
+                        break;
+                    case 'd':
+                        if (t_cursor_x < TUTORIAL_WIDTH - 2) {
+                            swap_x = t_cursor_x + 1;
+                            valid_swap = true;
+                        }
+                        break;
+                }
+                
+                if (valid_swap) {
+                    // Échanger les formes
+                    char temp = tutorial_map[swap_y][swap_x];
+                    tutorial_map[swap_y][swap_x] = tutorial_map[t_cursor_y][t_cursor_x];
+                    tutorial_map[t_cursor_y][t_cursor_x] = temp;
+                    moves++;
+                }
+                break;
+        }
+        
+        t_cursor_x = new_x;
+        t_cursor_y = new_y;
+    }
+    
+    clrscr();
+    set_color(GREEN, BLACK);
+    printf("\n\n   Parfait ! Tu es maintenant prêt pour l'aventure !\n");
+    printf("   N'oublie pas : courage et persévérance sont tes meilleurs alliés.\n");
+    printf("   dans le fôret il existe des combinaisons des carrés et même l'élusive suite de 6...\n\n");
+    set_color(WHITE, BLACK);
+    printf("   Bonne chance, héros !\n\n");
+    printf("   Appuie sur une touche pour revenir au menu...");
     getch();
 }
