@@ -53,7 +53,7 @@ int endscreen(bool gameover, int level, int life) {
     int running = 1;
     while (running) {
         clrscr();
-        if (gameover && level == 0) {
+        if (gameover && life == 0) {
             for (int i = 0; i < 9; i++) {
                 for (int j = 0; j < 18; j++) {
                     if (i <= 4) {
