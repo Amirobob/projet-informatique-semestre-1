@@ -2,54 +2,54 @@
 #include "affichage.h"
 #include "fichiers.h"
 
-// Forward declarations
+//declarations
 void gravity(char map[ymax][xmax], int *star_chance, int level);
 bool destroy(char map[ymax][xmax], int stats[10], int *star_chance);
 
-void generate_map(char map[ymax][xmax]) {
+void generate_map(char map[ymax][xmax]){
     int temp;
-    for (int y = 0; y < ymax; y++) {
-        for (int x = 0; x < xmax; x++) {
-            bool onborder = (y == 0 || y == ymax - 1|| x == 0 || x == xmax - 1);
-            if (onborder) map[y][x] = '#';
-            else {
-                switch(temp = rand() % 5) {  // Changed from 3 to 5
-                case(0): map[y][x] = CIRCLE; break;
-                case(1): map[y][x] = SQUARE; break;
-                case(2): map[y][x] = TRIANGLE; break;
-                case(3): map[y][x] = DIAMOND; break;
-                case(4): map[y][x] = HEXAGON; break;
+    for(int y=0; y<ymax; y++){
+        for(int x=0; x<xmax; x++){
+            bool onborder=(y==0 || y==ymax-1|| x==0 || x==xmax-1);
+            if(onborder) map[y][x]='#';
+            else{
+                switch(temp=rand()%5){
+                case(0): map[y][x]=CIRCLE; break;
+                case(1): map[y][x]=SQUARE; break;
+                case(2): map[y][x]=TRIANGLE; break;
+                case(3): map[y][x]=DIAMOND; break;
+                case(4): map[y][x]=HEXAGON; break;
                 }
             }
         }
     }
 
-    // remove identicals
-    int passes = 0;
+    //retirer identiques
+    int passes=0;
     do{
-        for (int y = 1; y < ymax - 2; y++) {
-            for (int x = 1; x < xmax - 2; x++) {
-                bool horizontal = (x <= xmax - 3 && map[y][x] == map[y][x+1] && map[y][x] == map[y][x+2]);
-                bool vertical = (y <= ymax - 3 && map[y][x] == map[y+1][x] && map[y][x] == map[y+2][x]);
-                if (horizontal) {
+        for(int y=1; y<ymax-2; y++){
+            for(int x=1; x<xmax-2; x++){
+                bool horizontal=(x<=xmax-3 && map[y][x]==map[y][x+1] && map[y][x]==map[y][x+2]);
+                bool vertical=(y<=ymax-3 && map[y][x]==map[y+1][x] && map[y][x]==map[y+2][x]);
+                if(horizontal){
                     shapepick(map, x, y,1);
                 }
-                if (vertical) {
+                if(vertical){
                     shapepick(map, x, y,2);
                 }
             }
         }
         passes++;
-    }while (passes < 20);
+    }while(passes<20);
 }
 
 char shapepick(char map[ymax][xmax], int x, int y, int direction) {
     int temp;
     switch (direction) {
-        case 1: // Horizontal
+        case 1: //horizontal
                 do {
                 for (int i = 0; i < 3; i++) {
-                    temp = rand() % 5;  // Changed from 3 to 5
+                    temp = rand() % 5;
                     switch (temp) {
                         case 0: map[y][x+i] = CIRCLE; break;
                         case 1: map[y][x+i] = SQUARE; break;
@@ -60,10 +60,10 @@ char shapepick(char map[ymax][xmax], int x, int y, int direction) {
                 }
             } while (map[y][x] == map[y][x+1] && map[y][x] == map[y][x+2]);
             break;
-        case 2: // Vertical
+        case 2: //vertical
             do {
                 for (int i = 0; i < 3; i++) {
-                    temp = rand() % 5;  // Changed from 3 to 5
+                    temp = rand() % 5;
                     switch (temp) {
                         case 0: map[y+i][x] = CIRCLE; break;
                         case 1: map[y+i][x] = SQUARE; break;
@@ -78,35 +78,37 @@ char shapepick(char map[ymax][xmax], int x, int y, int direction) {
     return 0;
 }
 
-void eliminate_4x4(char map[ymax][xmax], int x, int y, int stats[10], int *star_chance) {
-    // Eliminate all blocks in a 4x4 square around position (x, y)
-    int count = 0;
-    for (int dy = -1; dy <= 2; dy++) {
-        for (int dx = -1; dx <= 2; dx++) {
-            int nx = x + dx;
-            int ny = y + dy;
-            // Check if position is valid and not a border
-            if (nx >= 1 && nx < xmax - 1 && ny >= 1 && ny < ymax - 1) {
-                char c = map[ny][nx];
-                if (c != ' ' && c != '#') {
-                    map[ny][nx] = ' ';
+void eliminate_4x4(char map[ymax][xmax], int x, int y, int stats[10], int *star_chance){
+    //eliminer 4x4
+    int count=0;
+    int non_star_count=0;
+    for(int dy=-1; dy<=2; dy++){
+        for(int dx=-1; dx<=2; dx++){
+            int nx=x+dx;
+            int ny=y+dy;
+            //verifier bordures
+            if(nx>=1 && nx<xmax-1 && ny>=1 && ny<ymax-1){
+                char c=map[ny][nx];
+                if(c!=' ' && c!='#'){
+                    map[ny][nx]=' ';
                     count++;
-                    // Update shape counters (not for star itself)
-                    if (c != STAR) {
-                        if (c == SQUARE && stats[5] > 0) stats[5]--;
-                        else if (c == TRIANGLE && stats[6] > 0) stats[6]--;
-                        else if (c == CIRCLE && stats[7] > 0) stats[7]--;
-                        else if (c == DIAMOND && stats[8] > 0) stats[8]--;
-                        else if (c == HEXAGON && stats[9] > 0) stats[9]--;
-                        // Increase star chance by 1% per block destroyed
-                        *star_chance += 1;
-                        if (*star_chance > 99) *star_chance = 99; // Cap at 99%
+                    //compteur formes
+                    if(c!=STAR){
+                        if(c==SQUARE && stats[5]>0) stats[5]--;
+                        else if(c==TRIANGLE && stats[6]>0) stats[6]--;
+                        else if(c==CIRCLE && stats[7]>0) stats[7]--;
+                        else if(c==DIAMOND && stats[8]>0) stats[8]--;
+                        else if(c==HEXAGON && stats[9]>0) stats[9]--;
+                        non_star_count++;
                     }
                 }
             }
         }
     }
-    stats[2] += count * 2; // Double points for star power!
+    //etoile donne moitie
+    *star_chance+=non_star_count/2;
+    if(*star_chance>99) *star_chance=99;
+    stats[2]+=count*2; //points x2
 }
 
 void moveshape(char map[ymax][xmax], int x, int y, int stats[10], int *star_chance, int *cursor_x, int *cursor_y) {
@@ -138,7 +140,7 @@ void moveshape(char map[ymax][xmax], int x, int y, int stats[10], int *star_chan
     }
     
     if (new_x != x || new_y != y) {
-        // Check if we're moving a star
+        //verifier etoile
         bool moving_star = (map[y][x] == STAR);
         
         char temp = map[new_y][new_x];
@@ -146,11 +148,11 @@ void moveshape(char map[ymax][xmax], int x, int y, int stats[10], int *star_chan
         map[y][x] = temp;
         stats[4]--;
         
-        // If a star was moved manually, trigger 4x4 elimination at new position
+        //pouvoir etoile
         if (moving_star) {
             eliminate_4x4(map, new_x, new_y, stats, star_chance);
             
-            // Apply gravity and continue chain reactions after star elimination
+            //gravite
             clrscr();
             print_map(map, stats, *cursor_x, *cursor_y);
             Sleep(500);
@@ -161,7 +163,7 @@ void moveshape(char map[ymax][xmax], int x, int y, int stats[10], int *star_chan
             print_map(map, stats, *cursor_x, *cursor_y);
             Sleep(500);
             
-            // Continue destroying any new matches
+            //enchainements
             while (destroy(map, stats, star_chance)) {
                 clrscr();
                 print_map(map, stats, *cursor_x, *cursor_y);
@@ -214,11 +216,11 @@ void gravity(char map[ymax][xmax], int *star_chance, int level) {
     for (int x = 1; x < xmax - 1; x++) {
         for (int y = 1; y < ymax - 1; y++) {
             if (map[y][x] == ' ') {
-                // Check if we should spawn a star based on chance (only from level 2 onwards)
+                //spawn etoile
                 int roll = rand() % 100;
                 if (level >= 1 && roll < *star_chance) {
                     map[y][x] = STAR;
-                    *star_chance = 1; // Reset chance after spawning a star
+                    *star_chance = 1; //reset
                 } else {
                     map[y][x] = types[rand() % 5];
                 }
@@ -233,14 +235,14 @@ bool destroy(char map[ymax][xmax], int stats[10], int *star_chance) {
     for (int y = 1; y < ymax - 1; y++) {
         for (int x = 1; x < xmax - 1; x++) {
             char c = map[y][x];
-            if (c == ' ' || c == STAR) continue;  // Skip empty spaces and stars
+            if (c == ' ' || c == STAR) continue;
             
-            // Horizontal 6
+            //h6
             bool h6 = (x <= xmax - 7 && 
                       map[y][x+1] == c && map[y][x+2] == c && 
                       map[y][x+3] == c && map[y][x+4] == c && map[y][x+5] == c);
             
-            // Vertical 6
+            //v6
             bool v6 = (y <= ymax - 7 && 
                       map[y+1][x] == c && map[y+2][x] == c && 
                       map[y+3][x] == c && map[y+4][x] == c && map[y+5][x] == c);
@@ -256,7 +258,7 @@ bool destroy(char map[ymax][xmax], int stats[10], int *star_chance) {
                     }
                 }
                 stats[2] += count;
-                *star_chance += count * 1;  // Increase star chance by 1% per block
+                *star_chance += count * 1;
                 if (*star_chance > 99) *star_chance = 99;
                 if (c == SQUARE && stats[5] > 0) stats[5] -= count;
                 else if (c == TRIANGLE && stats[6] > 0) stats[6] -= count;
@@ -267,18 +269,18 @@ bool destroy(char map[ymax][xmax], int stats[10], int *star_chance) {
                 continue;
             }
             
-            // 3x3 Filled Square - eliminates 6x6 area
+            //carre 3x3 plein
             bool filled_3x3 = (x <= xmax - 4 && y <= ymax - 4 &&
                               map[y][x+1] == c && map[y][x+2] == c &&
                               map[y+1][x] == c && map[y+1][x+1] == c && map[y+1][x+2] == c &&
                               map[y+2][x] == c && map[y+2][x+1] == c && map[y+2][x+2] == c);
             
             if (filled_3x3) {
-                // Calculate center of 3x3 (which is at x+1, y+1)
+                //centre
                 int center_x = x + 1;
                 int center_y = y + 1;
                 
-                // Eliminate 6x6 area around center (-2 to +3 from center)
+                //eliminer 6x6
                 int count = 0;
                 for (int dy = -2; dy <= 3; dy++) {
                     for (int dx = -2; dx <= 3; dx++) {
@@ -289,7 +291,7 @@ bool destroy(char map[ymax][xmax], int stats[10], int *star_chance) {
                             if (block != ' ' && block != '#' && block != STAR) {
                                 map[ny][nx] = ' ';
                                 count++;
-                                // Update shape counters
+                                //maj compteurs
                                 if (block == SQUARE && stats[5] > 0) stats[5]--;
                                 else if (block == TRIANGLE && stats[6] > 0) stats[6]--;
                                 else if (block == CIRCLE && stats[7] > 0) stats[7]--;
@@ -299,14 +301,14 @@ bool destroy(char map[ymax][xmax], int stats[10], int *star_chance) {
                         }
                     }
                 }
-                stats[2] += count * 3; // Triple points for this powerful combo!
+                stats[2] += count * 3; //x3 points
                 *star_chance += count * 1;
                 if (*star_chance > 99) *star_chance = 99;
                 destroyed = true;
                 continue;
             }
             
-            // Cross 5x5
+            //croix 5x5
             bool cross = (x >= 3 && x <= xmax - 4 && y >= 3 && y <= ymax - 4 &&
                          map[y-2][x] == c && map[y-1][x] == c && 
                          map[y+1][x] == c && map[y+2][x] == c &&
@@ -538,18 +540,18 @@ void difficulty(int stats[]) {
     int level = stats[0]; // give em hell!
     int liveslost = 3 - stats[1]; // give em mercy!
     
-    stats[3] = 60 - (level * 2) + (liveslost * 10); // time
-    stats[4] = 20 - level + (liveslost * 3); // turns
+    stats[3] = 60 - (level * 3) + (liveslost * 20); // time
+    stats[4] = 20 - level + (liveslost * 6); // turns
     for (int i = 5; i <= 9; i++) {
-        stats[i] = level * 2 + (rand() % 20) - (liveslost * 3); // shapes
+        stats[i] = level * 4 + (rand() % 20) - (liveslost * 7); // shapes
     }
     if (stats[3] < 30) stats[3] = 30;  //time min
     if (stats[4] < 10) stats[4] = 10;  //turns min
-    if (stats[5] < 5) stats[5] = 5; // shapes min start
-    if (stats[6] < 5) stats[6] = 5; 
-    if (stats[7] < 5) stats[7] = 5; 
-    if (stats[8] < 5) stats[8] = 5; 
-    if (stats[9] < 5) stats[9] = 5; // shapes min end
+    if (stats[5] < 3) stats[5] = 3; // shapes min start
+    if (stats[6] < 3) stats[6] = 3; 
+    if (stats[7] < 3) stats[7] = 3; 
+    if (stats[8] < 3) stats[8] = 3; 
+    if (stats[9] < 3) stats[9] = 3; // shapes min end
 }
 
 void playgame(int stats[], char map[ymax][xmax]) {

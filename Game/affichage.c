@@ -11,58 +11,58 @@ int endscreen(bool gameover, int level, int life) {
     char gameover_menu[13][18] = {
         " _______________ ",
         "|  ___________  |",
-        "| | game over | |",
+        "| |  perdu !  | |",
         "| |___________| |",
         "|_______________|",
-        "   Better luck!  ",
+        " Meilleure fois!",
         " ________________",
-        "|   Try again    |",
+        "|   Reessayer   |",
         "|________________|",
-        "|save last level |",
+        "|sauver niveau  |",
         "|________________|",
-        "|   leave game   |",
+        "|    Quitter    |",
         "|________________|"
     };
     
     char won_menu[13][34] = {
         " _______________________________ ",
         "|  ___________________________  |",
-        "| | congratulations, you won! | |",
+        "| |  Felicitations, gagne !   | |",
         "| |___________________________| |",
         "|_______________________________|",
         "                                ",
         "       ________________         ",
-        "      |   next level   |        ",
+        "      | Niveau suivant|        ",
         "      |________________|        ",
-        "      | save progress  |        ",
+        "      |Sauver progres |        ",
         "      |________________|        ",
-        "      |   leave game   |        ",
+        "      |    Quitter    |        ",
         "      |________________|        "
     };
     char wonforgood[13][34] = {
         " _______________________________ ",
         "|  ___________________________  |",
-        "| |  You finished the game !  | |",
+        "| |    Jeu termine ! Bravo!   | |",
         "| |___________________________| |",
         "|_______________________________|",
         "                                ",
         "       ________________         ",
-        "      |  endless mode  |        ",
+        "      |  Mode infini  |        ",
         "      |________________|        ",
-        "      | save progress  |        ",
+        "      |Sauver progres |        ",
         "      |________________|        ",
-        "      |   leave game   |        ",
+        "      |    Quitter    |        ",
         "      |________________|        "
     };
     char doneforgood[9][18] = {
         " _______________ ",
         "|  ___________  |",
-        "| | game over | |",
+        "| |  perdu !  | |",
         "| |___________| |",
         "|_______________|",
-        "All out of lives!",
+        "Plus de vies!   ",
         " ________________",
-        "|   leave game   |",
+        "|    Quitter    |",
         "|________________|",
     };
     int running = 1;
@@ -186,10 +186,10 @@ int menu(void) {
         "|-----------------------------|",
         "|         ECE Heroes!         |",
         "|-----------------------------|",
-        "|       1. Start Game         |",
-        "|       2. Continue Game      |",
-        "|       3. Instructions       |",
-        "|       4. Exit               |",
+        "|      1. Demarrer Jeu        |",
+        "|      2. Continuer Jeu       |",
+        "|      3. Instructions        |",
+        "|      4. Quitter             |",
         "|-----------------------------|"
     };
 
@@ -220,39 +220,39 @@ int menu(void) {
 }
 
 
-void stat(int y, int stats[10]) {  // Changed from stats[8] to stats[10]
-    switch(y) {
+void stat(int y, int stats[10]){
+    switch(y){
         case 1:
             set_color(GREEN, BLACK);
             printf("   |Score: %d", stats[2]);
             break;
         case 2:
             set_color(MAGENTA, BLACK);
-            printf("   |Level: %d\tLives: %d", stats[0]+1, stats[1]);
+            printf("   |Niveau: %d\tVies: %d", stats[0]+1, stats[1]);
             break;
         case 3:
             set_color(RED, BLACK);
-            printf("   |Time: %d\tTurns: %d", stats[3], stats[4]);
+            printf("   |Temps: %d\tTours: %d", stats[3], stats[4]);
             break;
         case 4:
             set_color(YELLOW, BLACK);
-            printf("   |Squares left: %d", stats[5]);
+            printf("   |Carres restants: %d", stats[5]);
             break;
         case 5:
             set_color(GREEN, BLACK);
-            printf("   |Triangles left: %d", stats[6]);
+            printf("   |Triangles restants: %d", stats[6]);
             break;
         case 6:
             set_color(BLUE, BLACK);
-            printf("   |Circles left: %d", stats[7]);
+            printf("   |Cercles restants: %d", stats[7]);
             break;
         case 7:
             set_color(RED, BLACK);
-            printf("   |Diamonds left: %d", stats[8]);
+            printf("   |Diamants restants: %d", stats[8]);
             break;
         case 8:
             set_color(CYAN, BLACK);
-            printf("   |Hexagons left: %d", stats[9]);
+            printf("   |Hexagones restants: %d", stats[9]);
             break;
     } 
 }
