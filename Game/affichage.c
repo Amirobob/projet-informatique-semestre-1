@@ -1,53 +1,142 @@
 #include "affichage.h"
 
-void endscreen(bool gameover, int level) { // il faut afficher ces menus lorsque le jeu est fini, ils doivent etre navigables comme le menu principal, n'oubliez pas d'augmenter le niveau du jeu
-    if (gameover) {
-        char gameovermessage[][18] = {
-            " _______________ ",
-            "|  ___________  |",
-            "| | game over | |",
-            "| |___________| |",
-            "|_______________|",
-        };
-        set_color(RED, BLACK);
-        for (int i = 0; i < 5; i++) {
-            printf("%s\n", gameovermessage[i]);
+int endscreen(bool gameover, int level, int life) {
+    set_color(WHITE, BLACK);
+    char input = 0;
+    int selected = 0;
+    const int min_select = 0;
+    const int max_select = 2;
+    
+    // Define both menus
+    char gameover_menu[13][18] = {
+        " _______________ ",
+        "|  ___________  |",
+        "| | game over | |",
+        "| |___________| |",
+        "|_______________|",
+        "   Better luck!  ",
+        " ________________",
+        "|   Try again    |",
+        "|________________|",
+        "|save last level |",
+        "|________________|",
+        "|   leave game   |",
+        "|________________|"
+    };
+    
+    char won_menu[13][34] = {
+        " _______________________________ ",
+        "|  ___________________________  |",
+        "| | congratulations, you won! | |",
+        "| |___________________________| |",
+        "|_______________________________|",
+        "                                ",
+        "       ________________         ",
+        "      |   next level   |        ",
+        "      |________________|        ",
+        "      | save progress  |        ",
+        "      |________________|        ",
+        "      |   leave game   |        ",
+        "      |________________|        "
+    };
+    char doneforgood[9][18] = {
+        " _______________ ",
+        "|  ___________  |",
+        "| | game over | |",
+        "| |___________| |",
+        "|_______________|",
+        "All out of lives!",
+        " ________________",
+        "|   leave game   |",
+        "|________________|",
+    };
+    int running = 1;
+    while (running) {
+        clrscr();
+        if (gameover && level == 0) {
+            for (int i = 0; i < 9; i++) {
+                for (int j = 0; j < 18; j++) {
+                    if (i <= 4) {
+                        set_color(RED, BLACK);
+                    }
+                    else if (i >= 7 && i <= 8) {
+                        set_color(BLACK, WHITE);
+                    }
+                    printf("%c", doneforgood[i][j]);
+                }
+                printf("\n");
+            }
+            getch();
+            return 2;
         }
-        set_color(WHITE, BLACK);
-        printf("Better luck next time!\n");
-        printf(" ________________\n");
-        printf("|Try again       |\n");
-        printf("|________________|\n");
-        printf("|save last level |\n");
-        printf("|________________|\n");
-        printf("|leave game      |\n");
-        printf("|________________|\n");
-    } else {
-        char won[][34] = {
-            " _______________________________ ",
-            "|  ___________________________  |",
-            "| | congratulations, you won! | |",
-            "| |___________________________| |",
-            "|_______________________________|",
-        };
-        set_color(GREEN, BLACK);
-        for (int i = 0; i < 5; i++) {
-            printf("%s\n", won[i]);
+        else if (gameover) {
+            for (int i = 0; i < 13; i++) {
+                for (int j = 0; j < 18; j++) {
+                    if (i >= 0 && i <= 4) {
+                        set_color(RED, BLACK);
+                    }
+                    else if (i == 5) {
+                        set_color(WHITE, BLACK);
+                    }
+                    else if (i > 6 && i <= 8 && selected == 0 && j > 1 && j < 16) {
+                        set_color(BLACK, WHITE);
+                    }
+                    else if (i >= 9 && i <= 10 && selected == 1 && j > 1 && j < 16) {
+                        set_color(BLACK, WHITE);
+                    }
+                    else if (i >= 11 && i <= 12 && selected == 2 && j > 1 && j < 16) {
+                        set_color(BLACK, WHITE);
+                    }
+                    else {
+                        set_color(WHITE, BLACK);
+                    }
+                    printf("%c", gameover_menu[i][j]);
+                }
+                printf("\n");
+            }
+        } else {
+            for (int i = 0; i < 13; i++) {
+                for (int j = 0; j < 34; j++) {
+                    if (i >= 0 && i <= 4) {
+                        set_color(GREEN, BLACK);
+                    }
+                    else if (i == 5) {
+                        set_color(WHITE, BLACK);
+                    }
+                    else if (i >= 6 && i <= 8 && selected == 0 && j > 6 && j < 23) {
+                        set_color(BLACK, WHITE);
+                    }
+                    else if (i >= 9 && i <= 10 && selected == 1 && j > 6 && j < 23) {
+                        set_color(BLACK, WHITE);
+                    }
+                    else if (i >= 11 && i <= 12 && selected == 2 && j > 6 && j < 23) {
+                        set_color(BLACK, WHITE);
+                    }
+                    else {
+                        set_color(WHITE, BLACK);
+                    }
+                    printf("%c", won_menu[i][j]);
+                }
+                printf("\n");
+            }
         }
+        
         set_color(WHITE, BLACK);
-        printf("       ________________\n");
-        printf("      |next level      |\n");
-        printf("      |________________|\n");
-        printf("      |save progress   |\n");
-        printf("      |________________|\n");
-        printf("      |leave game      |\n");
-        printf("      |________________|\n");
+        
+        while (!kbhit()) {}
+        input = getch();
+        
+        if (input == 's' && selected < max_select) selected++;
+        else if ((input == 'w' || input == 'z') && selected > min_select) selected--;
+        else if (input == '\n' || input == ' ') running = 0;
     }
+    
+    set_color(WHITE, BLACK);
+    return selected;
 }
 
 
 int menu(void) {
-    // setup
     set_color(WHITE, BLACK);
     char input = 0;
     int selected = 3; 
@@ -63,9 +152,8 @@ int menu(void) {
         "|-----------------------------|"
     };
 
-    // menu select
     int running = 1;
-    while (running) { // vous pouvez en vrai essayer de copy coller ce code pour faire un menu
+    while (running) {
         clrscr();
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 32; j++) {
@@ -81,7 +169,6 @@ int menu(void) {
             }
             printf("\n");
         }
-        // Wait for key press
         while (!kbhit()) {}
         input = getch();
         if (input == 's' && selected < max_select) selected++;
@@ -92,19 +179,18 @@ int menu(void) {
 }
 
 
-
-void stat(int y,int stats[8]){ // ne touchez pas, celui ci est fait
+void stat(int y, int stats[10]) {  // Changed from stats[8] to stats[10]
     switch(y) {
         case 1:
-        set_color(GREEN, BLACK);
+            set_color(GREEN, BLACK);
             printf("   |Score: %d", stats[2]);
             break;
         case 2:
-        set_color(MAGENTA, BLACK);
+            set_color(MAGENTA, BLACK);
             printf("   |Level: %d\tLives: %d", stats[0], stats[1]);
             break;
         case 3:
-        set_color(RED, BLACK);
+            set_color(RED, BLACK);
             printf("   |Time: %d\tTurns: %d", stats[3], stats[4]);
             break;
         case 4:
@@ -119,27 +205,29 @@ void stat(int y,int stats[8]){ // ne touchez pas, celui ci est fait
             set_color(BLUE, BLACK);
             printf("   |Circles left: %d", stats[7]);
             break;
+        case 7:
+            set_color(RED, BLACK);
+            printf("   |Diamonds left: %d", stats[8]);
+            break;
+        case 8:
+            set_color(CYAN, BLACK);
+            printf("   |Hexagons left: %d", stats[9]);
+            break;
     } 
 }
 
 
-
-
-
-bool print_map(char map[ymax][xmax], int stats[8], int cursor_x, int cursor_y) { // on peut rajouter des trucs apres, mais pas pour le moment
+bool print_map(char map[ymax][xmax], int stats[10], int cursor_x, int cursor_y) {  // Changed from stats[8] to stats[10]
    
     for (int y = 0; y < ymax; y++) {
         
         for (int x = 0; x < xmax; x++) {
             char c = map[y][x];
             
-            // Check if this position is under the cursor
             bool is_cursor = (y == cursor_y && x == cursor_x);
             
-            // Set background color FIRST based on cursor
             int bg_color = is_cursor ? WHITE : BLACK;
             
-            // Draw the candy with appropriate color and background
             if (c == CIRCLE) {
                 set_color(BLUE, bg_color);
                 printf("● ");
@@ -149,6 +237,12 @@ bool print_map(char map[ymax][xmax], int stats[8], int cursor_x, int cursor_y) {
             } else if (c == TRIANGLE) {
                 set_color(GREEN, bg_color);
                 printf("▲ ");
+            } else if (c == DIAMOND) {  // Added diamond
+                set_color(RED, bg_color);
+                printf("◆ ");
+            } else if (c == HEXAGON) {  // Added hexagon
+                set_color(CYAN, bg_color);
+                printf("⬡ ");
             } else if (c == '#') {
                 set_color(MAGENTA, bg_color);
                 printf("▩ ");
@@ -158,7 +252,7 @@ bool print_map(char map[ymax][xmax], int stats[8], int cursor_x, int cursor_y) {
             }
         }
         
-        set_color(WHITE, BLACK); // Reset before printing stats
+        set_color(WHITE, BLACK);
         stat(y, stats);
         printf("\n");
     }
@@ -220,6 +314,7 @@ void instructions(void) { // ajouter des tutoriels ici pour expliquer le jeu, av
     printf("- Tu vas partir à la quete de pieces d'or.\n");
     printf("- Tu vas affronter 3 niveaux, mais gare a toi, ils sont de plus en plus durs.\n");
     printf("- Ton but : aligner des formes entre elles pour les faire disparaitre.\n");
+    printf("- navigue ce donjon avec ZQSD, et espace pour echanger deux formes adjacentes.\n");
     printf("- Nous, on sera la pour te rappeler combien il en reste à combattre !\n\n");
 
     set_color(CYAN, BLACK);

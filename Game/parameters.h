@@ -14,3 +14,5 @@
 #define CIRCLE 'c'
 #define TRIANGLE 't'
 #define SQUARE 's'
+#define DIAMOND 'd'
+#define HEXAGON 'h'

@@ -1,5 +1,6 @@
 #include "jeu.h"
 #include "affichage.h"
+#include "fichiers.h"
 
 
 void generate_map(char map[ymax][xmax]) {
@@ -9,10 +10,12 @@ void generate_map(char map[ymax][xmax]) {
             bool onborder = (y == 0 || y == ymax - 1|| x == 0 || x == xmax - 1);
             if (onborder) map[y][x] = '#';
             else {
-                switch(temp = rand() % 3) {
+                switch(temp = rand() % 5) {  // Changed from 3 to 5
                 case(0): map[y][x] = CIRCLE; break;
                 case(1): map[y][x] = SQUARE; break;
                 case(2): map[y][x] = TRIANGLE; break;
+                case(3): map[y][x] = DIAMOND; break;
+                case(4): map[y][x] = HEXAGON; break;
                 }
             }
         }
@@ -25,11 +28,9 @@ void generate_map(char map[ymax][xmax]) {
             for (int x = 1; x < xmax - 2; x++) {
                 bool horizontal = (x <= xmax - 3 && map[y][x] == map[y][x+1] && map[y][x] == map[y][x+2]);
                 bool vertical = (y <= ymax - 3 && map[y][x] == map[y+1][x] && map[y][x] == map[y+2][x]);
-                // Horizontal
                 if (horizontal) {
                     shapepick(map, x, y,1);
                 }
-                // Vertical
                 if (vertical) {
                     shapepick(map, x, y,2);
                 }
@@ -45,11 +46,13 @@ char shapepick(char map[ymax][xmax], int x, int y, int direction) {
         case 1: // Horizontal
                 do {
                 for (int i = 0; i < 3; i++) {
-                    temp = rand() % 3;
+                    temp = rand() % 5;  // Changed from 3 to 5
                     switch (temp) {
                         case 0: map[y][x+i] = CIRCLE; break;
                         case 1: map[y][x+i] = SQUARE; break;
                         case 2: map[y][x+i] = TRIANGLE; break;
+                        case 3: map[y][x+i] = DIAMOND; break;
+                        case 4: map[y][x+i] = HEXAGON; break;
                     }
                 }
             } while (map[y][x] == map[y][x+1] && map[y][x] == map[y][x+2]);
@@ -57,11 +60,13 @@ char shapepick(char map[ymax][xmax], int x, int y, int direction) {
         case 2: // Vertical
             do {
                 for (int i = 0; i < 3; i++) {
-                    temp = rand() % 3;
+                    temp = rand() % 5;  // Changed from 3 to 5
                     switch (temp) {
                         case 0: map[y+i][x] = CIRCLE; break;
                         case 1: map[y+i][x] = SQUARE; break;
                         case 2: map[y+i][x] = TRIANGLE; break;
+                        case 3: map[y+i][x] = DIAMOND; break;
+                        case 4: map[y+i][x] = HEXAGON; break;
                     }
                 }
             } while (map[y][x] == map[y+1][x] && map[y][x] == map[y+2][x]);
@@ -70,14 +75,12 @@ char shapepick(char map[ymax][xmax], int x, int y, int direction) {
     return 0;
 }
 
-void moveshape(char map[ymax][xmax], int x, int y, int stats[8]) { // pas besoin de toucher a ceci
+void moveshape(char map[ymax][xmax], int x, int y, int stats[10]) {
     char input;
     
-    // Initial draw
     clrscr();
     print_map(map, stats, x, y);
     
-    // Get input
     input = getch();
     
     int new_x = x;
@@ -86,20 +89,20 @@ void moveshape(char map[ymax][xmax], int x, int y, int stats[8]) { // pas besoin
     switch (input) {
         case 'w':
         case 'z':
-            if (y > 1) new_y = y - 1;  // Up
+            if (y > 1) new_y = y - 1;
             break;
         case 's':
-            if (y < ymax - 2) new_y = y + 1;  // Down
+            if (y < ymax - 2) new_y = y + 1;
             break;
         case 'a':
         case 'q':
-            if (x > 1) new_x = x - 1;  // Left
+            if (x > 1) new_x = x - 1;
             break;
         case 'd':
-            if (x < xmax - 2) new_x = x + 1;  // Right
+            if (x < xmax - 2) new_x = x + 1;
             break;
     }
-    // Swap
+    
     if (new_x != x || new_y != y) {
         char temp = map[new_y][new_x];
         map[new_y][new_x] = map[y][x];
@@ -108,8 +111,7 @@ void moveshape(char map[ymax][xmax], int x, int y, int stats[8]) { // pas besoin
     }
 } 
 
-// Helper function
-void clear_type(char map[ymax][xmax], int stats[8], char c) { // pas besoin de toucher a ceci
+void clear_type(char map[ymax][xmax], int stats[10], char c) {
     int count = 0;
     for (int i = 1; i < ymax - 1; i++) {
         for (int j = 1; j < xmax - 1; j++) {
@@ -120,13 +122,14 @@ void clear_type(char map[ymax][xmax], int stats[8], char c) { // pas besoin de t
         }
     }
     stats[2] += count;
-    if (c == SQUARE) stats[5] -= count;
-    else if (c == TRIANGLE) stats[6] -= count;
-    else if (c == CIRCLE) stats[7] -= count;
+    if (c == SQUARE && stats[5] > 0) stats[5] -= count;
+    else if (c == TRIANGLE && stats[6] > 0) stats[6] -= count;
+    else if (c == CIRCLE && stats[7] > 0) stats[7] -= count;
+    else if (c == DIAMOND && stats[8] > 0) stats[8] -= count;
+    else if (c == HEXAGON && stats[9] > 0) stats[9] -= count;
 }
 
-void gravity(char map[ymax][xmax]) {  // pas besoin de toucher a ceci
-    // Make pieces fall
+void gravity(char map[ymax][xmax]) {
     bool moved = true;
     while (moved) {
         moved = false;
@@ -141,18 +144,17 @@ void gravity(char map[ymax][xmax]) {  // pas besoin de toucher a ceci
         }
     }
     
-    // Fill all empty spaces from top
-    char types[] = {CIRCLE, SQUARE, TRIANGLE};
+    char types[] = {CIRCLE, SQUARE, TRIANGLE, DIAMOND, HEXAGON};  // Added new shapes
     for (int x = 1; x < xmax - 1; x++) {
         for (int y = 1; y < ymax - 1; y++) {
             if (map[y][x] == ' ') {
-                map[y][x] = types[rand() % 3];
+                map[y][x] = types[rand() % 5];  // Changed from 3 to 5
             }
         }
     }
 }
 
-bool destroy(char map[ymax][xmax], int stats[8]) {  // pas besoin de toucher a ceci
+bool destroy(char map[ymax][xmax], int stats[10]) {
     bool destroyed = false;
     
     for (int y = 1; y < ymax - 1; y++) {
@@ -185,14 +187,12 @@ bool destroy(char map[ymax][xmax], int stats[8]) {  // pas besoin de toucher a c
             
             if (cross) {
                 int count = 0;
-                // Row clear
                 for (int j = 1; j < xmax - 1; j++) {
                     if (map[y][j] == c) {
                         map[y][j] = ' ';
                         count++;
                     }
                 }
-                // Column clear (skip already cleared center)
                 for (int i = 1; i < ymax - 1; i++) {
                     if (map[i][x] == c) {
                         map[i][x] = ' ';
@@ -200,9 +200,11 @@ bool destroy(char map[ymax][xmax], int stats[8]) {  // pas besoin de toucher a c
                     }
                 }
                 stats[2] += count;
-                if (c == SQUARE) stats[5] -= count;
-                else if (c == TRIANGLE) stats[6] -= count;
-                else if (c == CIRCLE) stats[7] -= count;
+                if (c == SQUARE && stats[5] > 0) stats[5] -= count;
+                else if (c == TRIANGLE && stats[6] > 0) stats[6] -= count;
+                else if (c == CIRCLE && stats[7] > 0) stats[7] -= count;
+                else if (c == DIAMOND && stats[8] > 0) stats[8] -= count;
+                else if (c == HEXAGON && stats[9] > 0) stats[9] -= count;
                 destroyed = true;
                 continue;
             }
@@ -218,7 +220,6 @@ bool destroy(char map[ymax][xmax], int stats[8]) {  // pas besoin de toucher a c
             if (square) {
                 int count = 0;
                 int border_count = 0;
-                // Border clear
                 for (int i = 0; i < 4; i++) {
                     if (map[y][x+i] != ' ') {
                         map[y][x+i] = ' ';
@@ -243,37 +244,42 @@ bool destroy(char map[ymax][xmax], int stats[8]) {  // pas besoin de toucher a c
                         border_count++;
                     }
                 }
-                // Inside clear
                 for (int i = 1; i < 3; i++) {
                     for (int j = 1; j < 3; j++) {
                         if (map[y+i][x+j] != ' ') {
                             char inside = map[y+i][x+j];
                             map[y+i][x+j] = ' ';
                             count++;
-                            if (inside == SQUARE) stats[5]--;
-                            else if (inside == TRIANGLE) stats[6]--;
-                            else if (inside == CIRCLE) stats[7]--;
+                            if (inside == SQUARE && stats[5] > 0) stats[5]--;
+                            else if (inside == TRIANGLE && stats[6] > 0) stats[6]--;
+                            else if (inside == CIRCLE && stats[7] > 0) stats[7]--;
+                            else if (inside == DIAMOND && stats[8] > 0) stats[8]--;
+                            else if (inside == HEXAGON && stats[9] > 0) stats[9]--;
                         }
                     }
                 }
                 stats[2] += count;
-                if (c == SQUARE) stats[5] -= border_count;
-                else if (c == TRIANGLE) stats[6] -= border_count;
-                else if (c == CIRCLE) stats[7] -= border_count;
+                if (c == SQUARE && stats[5] > 0) stats[5] -= border_count;
+                else if (c == TRIANGLE && stats[6] > 0) stats[6] -= border_count;
+                else if (c == CIRCLE && stats[7] > 0) stats[7] -= border_count;
+                else if (c == DIAMOND && stats[8] > 0) stats[8] -= border_count;
+                else if (c == HEXAGON && stats[9] > 0) stats[9] -= border_count;
                 destroyed = true;
                 continue;
             }
             
             // Horizontal 4
             bool h4 = (x <= xmax - 5 && 
-                      map[y][x+1] == c && map[y][x+2] == c && map[y][x+3] == c);
+                map[y][x+1] == c && map[y][x+2] == c && map[y][x+3] == c);
             if (h4) {
                 for (int i = 0; i < 4; i++) map[y][x+i] = ' ';
                 destroyed = true;
                 stats[2] += 4;
-                if (c == SQUARE) stats[5] -= 4;
-                else if (c == TRIANGLE) stats[6] -= 4;
-                else if (c == CIRCLE) stats[7] -= 4;
+                if (c == SQUARE && stats[5] > 0) stats[5] -= 4;
+                else if (c == TRIANGLE && stats[6] > 0) stats[6] -= 4;
+                else if (c == CIRCLE && stats[7] > 0) stats[7] -= 4;
+                else if (c == DIAMOND && stats[8] > 0) stats[8] -= 4;
+                else if (c == HEXAGON && stats[9] > 0) stats[9] -= 4;
             }
             
             // Vertical 4
@@ -283,22 +289,26 @@ bool destroy(char map[ymax][xmax], int stats[8]) {  // pas besoin de toucher a c
                 for (int i = 0; i < 4; i++) map[y+i][x] = ' ';
                 destroyed = true;
                 stats[2] += 4;
-                if (c == SQUARE) stats[5] -= 4;
-                else if (c == TRIANGLE) stats[6] -= 4;
-                else if (c == CIRCLE) stats[7] -= 4;
+                if (c == SQUARE && stats[5] > 0) stats[5] -= 4;
+                else if (c == TRIANGLE && stats[6] > 0) stats[6] -= 4;
+                else if (c == CIRCLE && stats[7] > 0) stats[7] -= 4;
+                else if (c == DIAMOND && stats[8] > 0) stats[8] -= 4;
+                else if (c == HEXAGON && stats[9] > 0) stats[9] -= 4;
             }
+            if (stats[5] < 0) stats[5] = 0;
+            if (stats[6] < 0) stats[6] = 0;
+            if (stats[7] < 0) stats[7] = 0;
+            if (stats[8] < 0) stats[8] = 0;
+            if (stats[9] < 0) stats[9] = 0;
         }
     }
     
-return destroyed;
+    return destroyed;
 }
 
-
-
-
-int game_loop(int stats[7], char map[ymax][xmax]) { // on ne touche pas de base, mais il y a quelquechose pour apres
-    int cursor_x = 0;
-    int cursor_y = 0;
+int game_loop(int stats[10], char map[ymax][xmax]) {
+    int cursor_x = 1;
+    int cursor_y = 1;
     
     gotoxy(1,1);
     show_cursor();
@@ -306,7 +316,6 @@ int game_loop(int stats[7], char map[ymax][xmax]) { // on ne touche pas de base,
     time_t last_update;
     time(&last_update);
     
-    // Initial draw
     clrscr();
     print_map(map, stats, cursor_x, cursor_y);
     
@@ -316,59 +325,57 @@ int game_loop(int stats[7], char map[ymax][xmax]) { // on ne touche pas de base,
         
         bool needs_redraw = false;
         
-        // Check if timer needs update (every second)
         int diff = (int)difftime(current, last_update);
         if (diff >= 1) {
-            stats[3] = stats[3] - diff; // Update time remaining
-            time(&last_update); // Reset the timer
+            stats[3] = stats[3] - diff;
+            time(&last_update);
             needs_redraw = true;
         }
         
-        // Check for keyboard input
         if (kbhit()) {
             char input = getch();
             switch (input) {
                 case 'w':
                 case 'z':
-                    if (cursor_y > 1) {  // Border check
+                    if (cursor_y > 1) {
                         cursor_y--;
                         needs_redraw = true;
                     }
                     break;
                 case 's':
-                    if (cursor_y < ymax - 2) {  // Border check
+                    if (cursor_y < ymax - 2) {
                         cursor_y++;
                         needs_redraw = true;
                     }
                     break;
                 case 'a':
                 case 'q':
-                    if (cursor_x > 1) {  // Border check
+                    if (cursor_x > 1) {
                         cursor_x--;
                         needs_redraw = true;
                     }
                     break;
                 case 'd':
-                    if (cursor_x < xmax - 2) {  // Border check
+                    if (cursor_x < xmax - 2) {
                         cursor_x++;
                         needs_redraw = true;
                     }
                     break;
-                case ' ':  // Select
+                case ' ':
                     moveshape(map, cursor_x, cursor_y, stats);
-                    while (kbhit()) {  // Clear buffer
+                    while (kbhit()) {
                         getch();
                     }
                     while (destroy(map, stats)) {
                         clrscr();
                         print_map(map, stats, cursor_x, cursor_y);
-                        Sleep(500); // Show destroyed
+                        Sleep(500);
                         
                         gravity(map);
                         
                         clrscr();
                         print_map(map, stats, cursor_x, cursor_y);
-                        Sleep(500); // Show after gravity
+                        Sleep(500);
                     }
                     needs_redraw = true;
                     break;
@@ -381,26 +388,63 @@ int game_loop(int stats[7], char map[ymax][xmax]) { // on ne touche pas de base,
         }
 
         if (stats[1] <= 0 || stats[3] <= 0 || stats[4] <= 0) {
-            gamestate = 2; // Game lost
+            gamestate = 2;
         }
-        if (stats[5] <= 0 && stats[6] <= 0 && stats[7] <= 0) {
-            gamestate = 1; // Game won
+        if (stats[5] <= 0 && stats[6] <= 0 && stats[7] <= 0 && stats[8] <= 0 && stats[9] <= 0) {
+            gamestate = 1;
         }
-        // put end conditions
         
     } while (gamestate == 0);
     
     return gamestate;
 }
 
+void difficulty(int stats[]) {
+    int level = stats[0];
+    
+    stats[3] = 60 - (level * 2);
+    stats[4] = 20 - level;
+    for (int i = 5; i <= 9; i++) {
+        stats[i] = level * 2 + rand() % 20;
+    }
+    if (stats[3] < 30) stats[3] = 30;
+    if (stats[4] < 10) stats[4] = 10;
+}
 
-void playgame(int stats[], char map[ymax][xmax]) { // pas besoin de toucher a ceci
-    // stats numbers: 0: level, 1: life, 2: score, 3: timeremaining, 4: turnsleft, 5:squareleft, 6:triangleleft, 7:circleleft
+void playgame(int stats[], char map[ymax][xmax]) {
     generate_map(map);
-    switch(game_loop(stats, map)) { // I think it's called a helper function?
-        case 1: //gamewon!!!
+    switch(game_loop(stats, map)) {
+        case 1:
+        stats[0]++;
+        switch (endscreen(0, stats[0], stats[1])) {
+            case 0:
+                generate_map(map);
+                difficulty(stats);
+                playgame(stats, map);
+                break;
+            case 1:
+                saveprogress(stats[0], stats);
+                break;
+            case 2:
+                break;
+        }
         break;
-        case 2: //gamelost :(
+        case 2:
+        stats[1]--;
+        switch (endscreen(1, stats[0], stats[1])) {
+            case 0:
+                generate_map(map);
+                stats[3] = 60;
+                stats[4] = 20;
+                difficulty(stats);
+                playgame(stats, map);
+                break;
+            case 1:
+                saveprogress(stats[0], stats);
+                break;
+            case 2:
+                break;
+        }
         break;
     }
 }

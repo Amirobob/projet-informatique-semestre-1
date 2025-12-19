@@ -1,68 +1,129 @@
 #include "Fichiers.h"
+#include "jeu.h"
 #define SAVEFILE "savegame.txt"
 
+#define MAX_PLAYERS 100
+
+typedef struct {
+    char name[50];
+    int stats[10];
+} Player;
+
+// Helper: load all
+int load_all_players(Player players[]) {
+    FILE *f = fopen(SAVEFILE, "r");
+    if (f == NULL) return 0;
+    
+    int count = 0;
+    while (count < MAX_PLAYERS && 
+           fscanf(f, "%49s %d %d %d %d %d %d %d %d %d %d",  // Added 2 more %d
+                  players[count].name,
+                  &players[count].stats[0],
+                  &players[count].stats[1],
+                  &players[count].stats[2],
+                  &players[count].stats[3],
+                  &players[count].stats[4],
+                  &players[count].stats[5],
+                  &players[count].stats[6],
+                  &players[count].stats[7],
+                  &players[count].stats[8],  // Diamond
+                  &players[count].stats[9]) == 11) {  // Hexagon, changed 9 to 11
+        count++;
+    }
+    fclose(f);
+    return count;
+}
+
+// Helper: save all
+void save_all_players(Player players[], int count) {
+    FILE *f = fopen(SAVEFILE, "w");
+    if (f == NULL) {
+        printf("Error: cannot save.\n");
+        getch();
+        return;
+    }
+    
+    for (int i = 0; i < count; i++) {
+        fprintf(f, "%s %d %d %d %d %d %d %d %d %d %d\n",  // Added 2 more %d
+                players[i].name,
+                players[i].stats[0], players[i].stats[1],
+                players[i].stats[2], players[i].stats[3],
+                players[i].stats[4], players[i].stats[5],
+                players[i].stats[6], players[i].stats[7],
+                players[i].stats[8], players[i].stats[9]);  // Added diamond, hexagon
+    }
+    fclose(f);
+}
+
+// Helper: find player
+int find_player(Player players[], int count, const char *name) {
+    for (int i = 0; i < count; i++) {
+        if (strcmp(players[i].name, name) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+// Save (only new players)
 void saveprogress(int level, int stats[]) {
     char playername[50];
+    Player players[MAX_PLAYERS];
+    
     set_color(WHITE, BLACK);
     printf("Enter your name to save progress: ");
     scanf("%49s", playername);
-
-    FILE *f = fopen(SAVEFILE, "a"); // ouvre le fichier pour écrire/ajouter, sans écraser
-    if (f == NULL) {
-        printf("Error: cannot open save file.\n");
+    
+    int count = load_all_players(players);
+    int index = find_player(players, count, playername);
+    
+    if (index >= 0) {
+        printf("Username '%s' already exists! Choose another name.\n", playername);
+        getch();
         return;
     }
-
-    // sauvegarde : pseudo + toutes les stats
-    fprintf(f, "%s %d %d %d %d %d %d %d %d\n",
-            playername,
-            stats[0], stats[1], stats[2], stats[3], stats[4],
-            stats[5], stats[6], stats[7]);
-    fclose(f);
-
-    printf("Progress saved for player '%s'!\n", playername);
-
+    
+    // Add new player
+    if (count >= MAX_PLAYERS) {
+        printf("Player limit reached!\n");
+        getch();
+        return;
+    }
+    
+    strcpy(players[count].name, playername);
+    for (int i = 0; i < 10; i++) {
+        players[count].stats[i] = stats[i];
+    }
+    count++;
+    
+    save_all_players(players, count);
+    printf("Progress saved for new player '%s'!\n", playername);
+    getch();
 }
 
-
-// charge progression d’un joueur
+// Load (existing only)
 void leveload(int stats[]) {
-    char playername[50], line[200], name_in_file[50];
-    bool found = false;
+    char playername[50];
+    Player players[MAX_PLAYERS];
     
     set_color(WHITE, BLACK);
     printf("Enter your name to load progress: ");
     scanf("%49s", playername);
-    FILE *f = fopen(SAVEFILE, "r");
-    if (f == NULL) {
-        printf("No save file found.\n");
-        return;
-    }
-
-    // parcours le fichier ligne par ligne
-    while (fgets(line, sizeof(line), f)) {
-        sscanf(line, "%s %d %d %d %d %d %d %d %d",
-               name_in_file,
-               stats[0], stats[1], stats[2], stats[3], stats[4],
-               stats[5], stats[6], stats[7]);
-
-        if (strcmp(name_in_file, playername) == 0) {
-            found = true;
-            break;
-        }
-    }
-
-    fclose(f);
     
-    if (found) { // à continuer ? : Mettre le joueur en jeu
-        printf("welcome back john doe! loading last level...\n");
+    int count = load_all_players(players);
+    int index = find_player(players, count, playername);
+    
+    if (index >= 0) {
+        for (int i = 0; i < 10; i++) {
+            stats[i] = players[index].stats[i];
+        }
+        printf("Welcome back %s! Loading last level...\n", playername);
         
         char map[ymax][xmax];
         generate_map(map);
-        playgame(stats, map);  // lance la partie avec les stats chargées
-    
+        playgame(stats, map);
     } else {
-        printf("\n name not found, try again\n");
+        printf("\nName not found, try again\n");
     }
-    
+    getch();
 }
